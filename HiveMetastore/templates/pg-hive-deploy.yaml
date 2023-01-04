@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name}}-pg-metastore-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: metadata
+            - name: POSTGRES_USER
+              value: hive
+            - name: PGDATA
+              value: /var/lib/postgresql/data
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+              subPath: postgres
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name}}-pg-metastore-pvc

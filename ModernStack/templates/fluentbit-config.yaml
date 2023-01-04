@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name}}-fluent-bit-config
+data:
+  parsers.conf: |-
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+  custom_parsers.conf: |
+    [PARSER]
+        Name docker_no_time
+        Format json
+        Time_Keep Off
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+  fluent-bit.conf: |
+    [INPUT]
+        Name tail
+        Path /var/log/containers/{{ .Release.Name}}-worker*.log
+        Parser docker
+        Tag worker.*
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+    [INPUT]
+        Name tail
+        Path /var/log/containers/{{ .Release.Name}}-scheduler*.log
+        Parser docker
+        Tag scheduler.*
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+    [INPUT]
+        Name tail
+        Path /var/log/containers/arrow-spark*.log
+        Parser docker
+        Tag spark.*
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+    [INPUT]
+        Name tail
+        Path /var/log/containers/{{ .Release.Name}}-webserver*.log
+        Parser docker
+        Tag webserver.*
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+
+
+    [OUTPUT]
+        Name          forward
+        Match         *
+        Host          ${FLUENTD_HOST}
+        Port          ${FLUENTD_PORT}
+        Retry_Limit   False
+
+    [OUTPUT]
+        Name stdout
+        Match *
+        Format json
+        Json_date_key timestamp
+        Json_date_format iso8601

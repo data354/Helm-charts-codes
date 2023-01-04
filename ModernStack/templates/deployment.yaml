@@ -1,0 +1,82 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name}}-redash
+spec:
+  selector:
+    matchLabels:
+      app: redash
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redash
+    spec:
+      volumes:
+      - name: postgres-for-redash
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name}}-pgredash-pv-claim
+      containers:
+      - name: redis
+        image: redis:5.0-alpine
+        ports:
+        - containerPort: 6379
+        imagePullPolicy: Always
+      - name:  postgres
+        image: postgres:9.5-alpine
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name}}-redash-cfg
+        volumeMounts:
+        - name: postgres-for-redash 
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+      - name: server
+        image: redash/redash:8.0.0.b32245
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name}}-redash-cfg
+        env:
+        - name: REDASH_WEB_WORKERS
+          value: "4"
+        args: ["server"]
+        ports:
+        - containerPort: 5000
+          name: redash
+      - name: scheduler
+        image: redash/redash:8.0.0.b32245
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name}}-redash-cfg
+        env:
+        - name: QUEUES
+          value: "celery"
+        - name: WORKERS_COUNT
+          value: "1"
+        args: ["scheduler"]
+      - name: scheduled-worker
+        image: redash/redash:8.0.0.b32245
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name}}-redash-cfg
+        env:
+        - name: QUEUES
+          value: "scheduled_queries,schemas"
+        - name: WORKERS_COUNT
+          value: "1"
+        args: ["worker"]
+      - name: adhoc-worker
+        image: redash/redash:8.0.0.b32245
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name}}-redash-cfg
+        env:
+        - name: QUEUES
+          value: "queries"
+        - name: WORKERS_COUNT
+          value: "2"
+        args: ["worker"]
+---

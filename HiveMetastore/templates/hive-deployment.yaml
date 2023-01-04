@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name}}-metastore
+spec:
+  selector:
+    matchLabels:
+      app: metastore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: metastore
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: metastore
+        image:  {{ .Values.image}}            
+        ports:
+        - containerPort: 9083
+        volumeMounts:
+        - name: metastore-cfg-vol
+          mountPath: {{ .Values.binDirectory}}/conf
+        - name: metastore-cfg-vol
+          mountPath: {{ .Values.hadoopDirectory}}/etc/hadoop
+        command: ["{{ .Values.binDirectory}}/bin/start-metastore"]
+        args: ["-p","9083"]
+        imagePullPolicy: Always
+      volumes:
+        - name: metastore-cfg-vol
+          configMap:
+            name: {{ .Release.Name}}-hive-config
+        

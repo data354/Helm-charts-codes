@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name}}-trino-worker
+spec:
+  serviceName: {{ .Release.Name}}-trino-worker
+  replicas: {{ .Values.workers.replicas}}
+  selector:
+    matchLabels:
+      app: trino-worker
+  template:
+    metadata:
+      labels:
+        app: trino-worker
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: trino-worker
+        image: {{ .Values.image}}
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: {{ .Values.workers.resources.requests.cpu}}     #"1000m"
+            memory: {{ .Values.workers.resources.requests.memory}} #2Gi
+          limits:
+            cpu: {{ .Values.workers.resources.limits.cpu}} 
+            memory: {{ .Values.workers.resources.limits.memory}}
+        volumeMounts:
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/jvm.config
+          subPath: jvm.config
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/config.properties
+          subPath: config.properties.worker
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/node.properties
+          subPath: node.properties
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/catalog/hive.properties
+          subPath: hive.properties
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/catalog/iceberg.properties
+          subPath: iceberg.properties
+      volumes:
+        - name: trino-cfg-vol
+          configMap:
+            name: {{ .Release.Name}}-trino-configs
+  volumeClaimTemplates:
+  - metadata:
+      name: trino-tmp-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.workers.storage}}

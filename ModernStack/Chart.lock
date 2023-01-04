@@ -1,0 +1,15 @@
+dependencies:
+- name: Postgres354
+  repository: https://data354.github.io/Helmschart354/postgreschart/
+  version: 0.2.0
+- name: airflow
+  repository: https://airflow.apache.org
+  version: 1.7.0
+- name: minio
+  repository: https://charts.min.io/
+  version: 5.0.1
+- name: Trino
+  repository: https://data354.github.io/Helmschart354/Trino
+  version: 0.2.0
+digest: sha256:0bfb6daadb3633f438ea382328641fca631d19a0efbc94e68cdf6775ced182ff
+generated: "2022-12-22T11:54:25.492405415Z"

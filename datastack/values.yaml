@@ -1,0 +1,2063 @@
+# Default values for Modern-BI-STACK.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+hiveConnector: &hiveConnector true
+
+replicaCount: 1
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+fluentbit:
+  fluentdHost: "34.123.42.247"
+  fluentdPort: "30005" 
+
+airflow:
+  enabled: true
+  affinity: {}
+  airflowConfigAnnotations: {}
+  airflowHome: /opt/airflow
+  airflowLocalSettings: |-
+    {{- if semverCompare ">=2.2.0" .Values.airflowVersion }}
+    {{- if not (or .Values.webserverSecretKey .Values.webserverSecretKeySecretName) }}
+    from airflow.www.utils import UIAlert
+
+    DASHBOARD_UIALERTS = [
+      UIAlert(
+        'Usage of a dynamic webserver secret key detected. We recommend a static webserver secret key instead.'
+        ' See the <a href='
+        '"https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key">'
+        'Helm Chart Production Guide</a> for more details.',
+        category="warning",
+        roles=["Admin"],
+        html=True,
+      )
+    ]
+    {{- end }}
+    {{- end }}
+  airflowPodAnnotations: {}
+  airflowVersion: 2.4.1
+  allowPodLaunching: true
+  cleanup:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - exec airflow kubernetes cleanup-pods --namespace={{ .Release.Namespace }}
+    command: null
+    enabled: false
+    env: []
+    failedJobsHistoryLimit: null
+    labels: {}
+    nodeSelector: {}
+    podAnnotations: {}
+    resources: {}
+    schedule: '*/15 * * * *'
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    successfulJobsHistoryLimit: null
+    tolerations: []
+    topologySpreadConstraints: []
+  config:
+    celery:
+      flower_url_prefix: '{{ .Values.ingress.flower.path }}'
+      worker_concurrency: 16
+    celery_kubernetes_executor:
+      kubernetes_queue: kubernetes
+    core:
+      colored_console_log: "False"
+      dags_folder: '{{ include "airflow_dags" . }}'
+      executor: '{{ .Values.executor }}'
+      load_examples: "False"
+      remote_logging: '{{- ternary "True" "False" .Values.elasticsearch.enabled }}'
+    elasticsearch:
+      json_format: "True"
+      log_id_template: '{dag_id}_{task_id}_{execution_date}_{try_number}'
+    elasticsearch_configs:
+      max_retries: 3
+      retry_timeout: "True"
+      timeout: 30
+    kerberos:
+      ccache: '{{ .Values.kerberos.ccacheMountPath }}/{{ .Values.kerberos.ccacheFileName
+        }}'
+      keytab: '{{ .Values.kerberos.keytabPath }}'
+      principal: '{{ .Values.kerberos.principal }}'
+      reinit_frequency: '{{ .Values.kerberos.reinitFrequency }}'
+    kubernetes:
+      airflow_configmap: '{{ include "airflow_config" . }}'
+      airflow_local_settings_configmap: '{{ include "airflow_config" . }}'
+      multi_namespace_mode: '{{ ternary "True" "False" .Values.multiNamespaceMode }}'
+      namespace: '{{ .Release.Namespace }}'
+      pod_template_file: '{{ include "airflow_pod_template_file" . }}/pod_template_file.yaml'
+      worker_container_repository: '{{ .Values.images.airflow.repository | default .Values.defaultAirflowRepository
+        }}'
+      worker_container_tag: '{{ .Values.images.airflow.tag | default .Values.defaultAirflowTag
+        }}'
+    logging:
+      colored_console_log: "False"
+      remote_logging: '{{- ternary "True" "False" .Values.elasticsearch.enabled }}'
+    metrics:
+      statsd_host: '{{ printf "%s-statsd" .Release.Name }}'
+      statsd_on: '{{ ternary "True" "False" .Values.statsd.enabled }}'
+      statsd_port: 9125
+      statsd_prefix: airflow
+    scheduler:
+      run_duration: 41460
+      standalone_dag_processor: '{{ ternary "True" "False" .Values.dagProcessor.enabled
+        }}'
+      statsd_host: '{{ printf "%s-statsd" .Release.Name }}'
+      statsd_on: '{{ ternary "True" "False" .Values.statsd.enabled }}'
+      statsd_port: 9125
+      statsd_prefix: airflow
+    webserver:
+      enable_proxy_fix: "True"
+      rbac: "True"
+  createUserJob:
+    affinity: {}
+    annotations: {}
+    args:
+    - bash
+    - -c
+    - |-
+      exec \
+      airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "users create" "create_user" }} "$@"
+    - --
+    - -r
+    - '{{ .Values.webserver.defaultUser.role }}'
+    - -u
+    - '{{ .Values.webserver.defaultUser.username }}'
+    - -e
+    - '{{ .Values.webserver.defaultUser.email }}'
+    - -f
+    - '{{ .Values.webserver.defaultUser.firstName }}'
+    - -l
+    - '{{ .Values.webserver.defaultUser.lastName }}'
+    - -p
+    - '{{ .Values.webserver.defaultUser.password }}'
+    command: null
+    env: []
+    extraContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    jobAnnotations: {}
+    labels: {}
+    nodeSelector: {}
+    resources: {}
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    tolerations: []
+    topologySpreadConstraints: []
+    useHelmHooks: true
+  dagProcessor:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - exec airflow dag-processor
+    command: null
+    enabled: false
+    env: []
+    extraContainers: []
+    extraInitContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    livenessProbe:
+      command: null
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 20
+    nodeSelector: {}
+    podAnnotations: {}
+    priorityClassName: null
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: null
+    safeToEvict: true
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    strategy:
+      rollingUpdate:
+        maxSurge: 100%
+        maxUnavailable: 50%
+    terminationGracePeriodSeconds: 60
+    tolerations: []
+    topologySpreadConstraints: []
+    waitForMigrations:
+      enabled: true
+      env: []
+  dags:
+    gitSync:
+      branch: master
+      containerName: git-sync
+      depth: 1
+      enabled: true
+      env: []
+      extraVolumeMounts: []
+      maxFailures: 0
+      repo: ssh://git@github.com/data354/Data-stack.git
+      resources: {}
+      rev: HEAD
+      securityContext: {}
+      sshKeySecret: airflow-git-secret
+      subPath: airflow/dags
+      uid: 65533
+      wait: 60
+    persistence:
+      accessMode: ReadWriteOnce
+      enabled: false
+      existingClaim: null
+      size: 1Gi
+      storageClassName: null
+      subPath: null
+  data:
+    brokerUrl: null
+    brokerUrlSecretName: null
+    metadataConnection:
+      db: postgres
+      host: null
+      pass: postgres
+      port: 5432
+      protocol: postgresql
+      sslmode: disable
+      user: postgres
+    metadataSecretName: null
+    resultBackendConnection: null
+    resultBackendSecretName: null
+  defaultAirflowRepository: apache/airflow
+  defaultAirflowTag: 2.4.1
+  elasticsearch:
+    connection: {}
+    enabled: false
+    secretName: null
+  enableBuiltInSecretEnvVars:
+    AIRFLOW__CELERY__BROKER_URL: true
+    AIRFLOW__CELERY__CELERY_RESULT_BACKEND: true
+    AIRFLOW__CELERY__RESULT_BACKEND: true
+    AIRFLOW__CORE__FERNET_KEY: true
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: true
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: true
+    AIRFLOW__ELASTICSEARCH__ELASTICSEARCH_HOST: true
+    AIRFLOW__ELASTICSEARCH__HOST: true
+    AIRFLOW__WEBSERVER__SECRET_KEY: true
+    AIRFLOW_CONN_AIRFLOW_DB: true
+  env: []
+  executor: CeleryExecutor
+  extraConfigMaps: {}
+  extraEnv: null
+  extraEnvFrom: null
+  extraSecrets: {}
+  fernetKey: null
+  fernetKeySecretName: null
+  flower:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - |-
+      exec \
+      airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "celery flower" "flower" }}
+    command: null
+    enabled: false
+    env: []
+    extraContainers: []
+    extraNetworkPolicies: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    networkPolicy:
+      ingress:
+        from: []
+        ports:
+        - port: '{{ .Values.ports.flowerUI }}'
+    nodeSelector: {}
+    password: null
+    podAnnotations: {}
+    priorityClassName: null
+    resources: {}
+    revisionHistoryLimit: null
+    secretName: null
+    securityContext: {}
+    service:
+      annotations: {}
+      loadBalancerIP: null
+      loadBalancerSourceRanges: []
+      ports:
+      - name: flower-ui
+        port: '{{ .Values.ports.flowerUI }}'
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    tolerations: []
+    topologySpreadConstraints: []
+    username: null
+  fullnameOverride: ""
+  gid: 0
+  images:
+    airflow:
+      pullPolicy: IfNotPresent
+      repository: yasminekd/airflow-sim
+      tag: latest
+    flower:
+      pullPolicy: IfNotPresent
+      repository: null
+      tag: null
+    gitSync:
+      pullPolicy: IfNotPresent
+      repository: k8s.gcr.io/git-sync/git-sync
+      tag: v3.4.0
+    migrationsWaitTimeout: 120
+    pgbouncer:
+      pullPolicy: IfNotPresent
+      repository: apache/airflow
+      tag: airflow-pgbouncer-2021.04.28-1.14.0
+    pgbouncerExporter:
+      pullPolicy: IfNotPresent
+      repository: apache/airflow
+      tag: airflow-pgbouncer-exporter-2021.09.22-0.12.0
+    pod_template:
+      pullPolicy: IfNotPresent
+      repository: null
+      tag: null
+    redis:
+      pullPolicy: IfNotPresent
+      repository: redis
+      tag: 6-bullseye
+    statsd:
+      pullPolicy: IfNotPresent
+      repository: quay.io/prometheus/statsd-exporter
+      tag: v0.22.8
+    useDefaultImageForMigration: false
+  ingress:
+    enabled: null
+    flower:
+      annotations: {}
+      enabled: false
+      host: ""
+      hosts: []
+      ingressClassName: ""
+      path: /
+      pathType: ImplementationSpecific
+      tls:
+        enabled: false
+        secretName: ""
+    web:
+      annotations: {}
+      enabled: false
+      host: ""
+      hosts: []
+      ingressClassName: ""
+      path: /
+      pathType: ImplementationSpecific
+      precedingPaths: []
+      succeedingPaths: []
+      tls:
+        enabled: false
+        secretName: ""
+  kerberos:
+    ccacheFileName: cache
+    ccacheMountPath: /var/kerberos-ccache
+    config: |
+      # This is an example config showing how you can use templating and how "example" config
+      # might look like. It works with the test kerberos server that we are using during integration
+      # testing at Apache Airflow (see `scripts/ci/docker-compose/integration-kerberos.yml` but in
+      # order to make it production-ready you must replace it with your own configuration that
+      # Matches your kerberos deployment. Administrators of your Kerberos instance should
+      # provide the right configuration.
+
+      [logging]
+      default = "FILE:{{ template "airflow_logs_no_quote" . }}/kerberos_libs.log"
+      kdc = "FILE:{{ template "airflow_logs_no_quote" . }}/kerberos_kdc.log"
+      admin_server = "FILE:{{ template "airflow_logs_no_quote" . }}/kadmind.log"
+
+      [libdefaults]
+      default_realm = FOO.COM
+      ticket_lifetime = 10h
+      renew_lifetime = 7d
+      forwardable = true
+
+      [realms]
+      FOO.COM = {
+        kdc = kdc-server.foo.com
+        admin_server = admin_server.foo.com
+      }
+    configPath: /etc/krb5.conf
+    enabled: false
+    keytabBase64Content: null
+    keytabPath: /etc/airflow.keytab
+    principal: airflow@FOO.COM
+    reinitFrequency: 3600
+  kubeVersionOverride: ""
+  labels: {}
+  limits: []
+  logs:
+    persistence:
+      enabled: false
+      existingClaim: null
+      size: 100Gi
+      storageClassName: null
+  migrateDatabaseJob:
+    affinity: {}
+    annotations: {}
+    args:
+    - bash
+    - -c
+    - |-
+      exec \
+      airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "db upgrade" "upgradedb" }}
+    command: null
+    enabled: true
+    extraContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    jobAnnotations: {}
+    nodeSelector: {}
+    resources: {}
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    tolerations: []
+    topologySpreadConstraints: []
+    useHelmHooks: true
+  multiNamespaceMode: false
+  nameOverride: ""
+  networkPolicies:
+    enabled: false
+  nodeSelector: {}
+  pgbouncer:
+    affinity: {}
+    args: null
+    auth_file: /etc/pgbouncer/users.txt
+    auth_type: md5
+    ciphers: normal
+    command:
+    - pgbouncer
+    - -u
+    - nobody
+    - /etc/pgbouncer/pgbouncer.ini
+    configSecretName: null
+    enabled: false
+    extraIni: null
+    extraIniMetadata: null
+    extraIniResultBackend: null
+    extraNetworkPolicies: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    logConnections: 0
+    logDisconnections: 0
+    maxClientConn: 100
+    metadataPoolSize: 10
+    metricsExporterSidecar:
+      resources: {}
+      sslmode: disable
+    nodeSelector: {}
+    podDisruptionBudget:
+      config:
+        maxUnavailable: 1
+      enabled: false
+    priorityClassName: null
+    resources: {}
+    resultBackendPoolSize: 5
+    revisionHistoryLimit: null
+    service:
+      extraAnnotations: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    ssl:
+      ca: null
+      cert: null
+      key: null
+    sslmode: prefer
+    tolerations: []
+    topologySpreadConstraints: []
+    uid: 65534
+    verbose: 0
+  podTemplate: null
+  ports:
+    airflowUI: 8080
+    flowerUI: 5555
+    pgbouncer: 6543
+    pgbouncerScrape: 9127
+    redisDB: 6379
+    statsdIngest: 9125
+    statsdScrape: 9102
+    workerLogs: 8793
+  postgresql:
+    audit:
+      clientMinMessages: error
+      logConnections: false
+      logDisconnections: false
+      logHostname: false
+      logLinePrefix: ""
+      logTimezone: ""
+      pgAuditLog: ""
+      pgAuditLogCatalog: "off"
+    common:
+      exampleValue: common-chart
+      global:
+        imagePullSecrets: []
+        imageRegistry: null
+        postgresql:
+          existingSecret: null
+          postgresqlDatabase: null
+          postgresqlPassword: null
+          postgresqlUsername: null
+          replicationPassword: null
+          servicePort: null
+        storageClass: null
+    commonAnnotations: {}
+    configurationConfigMap: null
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    enabled: true
+    existingSecret: null
+    extendedConfConfigMap: null
+    extraDeploy: []
+    extraEnv: []
+    extraEnvVarsCM: null
+    fullnameOverride: null
+    global:
+      imagePullSecrets: []
+      imageRegistry: null
+      postgresql: {}
+      storageClass: null
+    image:
+      debug: false
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      registry: docker.io
+      repository: bitnami/postgresql
+      tag: 11.12.0-debian-10-r44
+    initdbPassword: null
+    initdbScripts: {}
+    initdbScriptsConfigMap: null
+    initdbScriptsSecret: null
+    initdbUser: null
+    ldap:
+      baseDN: ""
+      bindDN: ""
+      enabled: false
+      port: ""
+      prefix: ""
+      scheme: ""
+      search_attr: ""
+      search_filter: ""
+      server: ""
+      suffix: ""
+      tls: {}
+      url: ""
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    metrics:
+      customMetrics: {}
+      enabled: false
+      extraEnvVars: {}
+      image:
+        pullPolicy: IfNotPresent
+        pullSecrets: []
+        registry: docker.io
+        repository: bitnami/postgres-exporter
+        tag: 0.9.0-debian-10-r108
+      livenessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      prometheusRule:
+        additionalLabels: {}
+        enabled: false
+        namespace: ""
+        rules: []
+      readinessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources: {}
+      securityContext:
+        enabled: false
+        runAsUser: 1001
+      service:
+        annotations:
+          prometheus.io/port: "9187"
+          prometheus.io/scrape: "true"
+        type: ClusterIP
+      serviceMonitor:
+        additionalLabels: {}
+        enabled: false
+    nameOverride: null
+    networkPolicy:
+      allowExternal: true
+      enabled: false
+      explicitNamespacesSelector: {}
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      mountPath: /bitnami/postgresql
+      selector: {}
+      size: 8Gi
+      subPath: ""
+    pgHbaConfiguration: ""
+    postgresqlConfiguration: null
+    postgresqlDataDir: /bitnami/postgresql/data
+    postgresqlDatabase: null
+    postgresqlDbUserConnectionLimit: null
+    postgresqlExtendedConf: null
+    postgresqlInitdbArgs: null
+    postgresqlInitdbWalDir: null
+    postgresqlMaxConnections: null
+    postgresqlPassword: postgres
+    postgresqlPghbaRemoveFilters: null
+    postgresqlPostgresConnectionLimit: null
+    postgresqlPostgresPassword: null
+    postgresqlSharedPreloadLibraries: pgaudit
+    postgresqlStatementTimeout: null
+    postgresqlTcpKeepalivesCount: null
+    postgresqlTcpKeepalivesIdle: null
+    postgresqlTcpKeepalivesInterval: null
+    postgresqlUsername: postgres
+    primary:
+      affinity: {}
+      annotations: {}
+      extraInitContainers: []
+      extraVolumeMounts: []
+      extraVolumes: []
+      labels: {}
+      nodeAffinityPreset:
+        key: ""
+        type: ""
+        values: []
+      nodeSelector: {}
+      podAffinityPreset: ""
+      podAnnotations: {}
+      podAntiAffinityPreset: soft
+      podLabels: {}
+      priorityClassName: ""
+      service: {}
+      sidecars: []
+      tolerations: []
+    primaryAsStandBy:
+      enabled: false
+    psp:
+      create: false
+    rbac:
+      create: false
+    readReplicas:
+      affinity: {}
+      annotations: {}
+      extraInitContainers: []
+      extraVolumeMounts: []
+      extraVolumes: []
+      labels: {}
+      nodeAffinityPreset:
+        key: ""
+        type: ""
+        values: []
+      nodeSelector: {}
+      persistence:
+        enabled: true
+      podAffinityPreset: ""
+      podAnnotations: {}
+      podAntiAffinityPreset: soft
+      podLabels: {}
+      priorityClassName: ""
+      resources: {}
+      service: {}
+      sidecars: []
+      tolerations: []
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    replication:
+      applicationName: my_application
+      enabled: false
+      numSynchronousReplicas: 0
+      password: repl_password
+      readReplicas: 1
+      synchronousCommit: "off"
+      user: repl_user
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    schedulerName: null
+    securityContext:
+      enabled: true
+      fsGroup: 1001
+    service:
+      annotations: {}
+      loadBalancerSourceRanges: []
+      port: 5432
+      type: ClusterIP
+    serviceAccount:
+      enabled: false
+    shmVolume:
+      chmod:
+        enabled: true
+      enabled: true
+    startupProbe:
+      enabled: false
+      failureThreshold: 10
+      initialDelaySeconds: 30
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 5
+    terminationGracePeriodSeconds: null
+    tls:
+      autoGenerated: false
+      certFilename: ""
+      certKeyFilename: ""
+      certificatesSecret: ""
+      enabled: false
+      preferServerCiphers: true
+    updateStrategy:
+      type: RollingUpdate
+    usePasswordFile: false
+    volumePermissions:
+      enabled: false
+      image:
+        pullPolicy: Always
+        pullSecrets: []
+        registry: docker.io
+        repository: bitnami/bitnami-shell
+        tag: 10-debian-10-r125
+      securityContext:
+        runAsUser: 0
+  quotas: {}
+  rbac:
+    create: true
+    createSCCRoleBinding: false
+  redis:
+    affinity: {}
+    enabled: true
+    nodeSelector: {}
+    password: null
+    passwordSecretName: null
+    persistence:
+      annotations: {}
+      enabled: true
+      size: 1Gi
+      storageClassName: null
+    podAnnotations: {}
+    resources: {}
+    safeToEvict: true
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    terminationGracePeriodSeconds: 600
+    tolerations: []
+    topologySpreadConstraints: []
+    uid: 0
+  registry:
+    connection: {}
+    secretName: null
+  revisionHistoryLimit: null
+  scheduler:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - exec airflow scheduler
+    command: null
+    env: []
+    extraContainers: []
+    extraInitContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    livenessProbe:
+      command: null
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 20
+    logGroomerSidecar:
+      args:
+      - bash
+      - /clean-logs
+      command: null
+      enabled: true
+      resources: {}
+      retentionDays: 15
+    nodeSelector: {}
+    podAnnotations: {}
+    podDisruptionBudget:
+      config:
+        maxUnavailable: 1
+      enabled: false
+    priorityClassName: null
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: null
+    safeToEvict: true
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    strategy: null
+    tolerations: []
+    topologySpreadConstraints: []
+    updateStrategy: null
+    waitForMigrations:
+      enabled: true
+      env: []
+  secret: []
+  securityContext: {}
+  statsd:
+    affinity: {}
+    enabled: true
+    extraMappings: []
+    extraNetworkPolicies: []
+    nodeSelector: {}
+    overrideMappings: []
+    podAnnotations: {}
+    priorityClassName: null
+    resources: {}
+    revisionHistoryLimit: null
+    securityContext: {}
+    service:
+      extraAnnotations: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    tolerations: []
+    topologySpreadConstraints: []
+    uid: 65534
+  tolerations: []
+  topologySpreadConstraints: []
+  triggerer:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - exec airflow triggerer
+    command: null
+    enabled: true
+    env: []
+    extraContainers: []
+    extraInitContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    livenessProbe:
+      command: null
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 20
+    nodeSelector: {}
+    podAnnotations: {}
+    priorityClassName: null
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: null
+    safeToEvict: true
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    strategy:
+      rollingUpdate:
+        maxSurge: 100%
+        maxUnavailable: 50%
+    terminationGracePeriodSeconds: 60
+    tolerations: []
+    topologySpreadConstraints: []
+    waitForMigrations:
+      enabled: true
+      env: []
+  uid: 50000
+  webserver:
+    affinity: {}
+    allowPodLogReading: true
+    args:
+    - bash
+    - -c
+    - exec airflow webserver
+    command: null
+    defaultUser:
+      email: admin@example.com
+      enabled: true
+      firstName: admin
+      lastName: user
+      password: admin
+      role: Admin
+      username: admin
+    env: []
+    extraContainers: []
+    extraInitContainers: []
+    extraNetworkPolicies: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    labels: {}
+    livenessProbe:
+      failureThreshold: 20
+      initialDelaySeconds: 15
+      periodSeconds: 5
+      scheme: HTTP
+      timeoutSeconds: 30
+    networkPolicy:
+      ingress:
+        from: []
+        ports:
+        - port: '{{ .Values.ports.airflowUI }}'
+    nodeSelector: {}
+    podAnnotations: {}
+    podDisruptionBudget:
+      config:
+        maxUnavailable: 1
+      enabled: false
+    priorityClassName: null
+    readinessProbe:
+      failureThreshold: 20
+      initialDelaySeconds: 15
+      periodSeconds: 5
+      scheme: HTTP
+      timeoutSeconds: 30
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: null
+    securityContext: {}
+    service:
+      annotations: {}
+      loadBalancerIP: null
+      loadBalancerSourceRanges: []
+      ports:
+      - name: airflow-ui
+        port: '{{ .Values.ports.airflowUI }}'
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    strategy: null
+    tolerations: []
+    topologySpreadConstraints: []
+    waitForMigrations:
+      enabled: true
+      env: []
+    webserverConfig: null
+  webserverSecretKey: null
+  webserverSecretKeySecretName: null
+  workers:
+    affinity: {}
+    args:
+    - bash
+    - -c
+    - |-
+      exec \
+      airflow {{ semverCompare ">=2.0.0" .Values.airflowVersion | ternary "celery worker" "worker" }}
+    command: null
+    env: []
+    extraContainers: []
+    extraInitContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    hostAliases: []
+    keda:
+      advanced: {}
+      cooldownPeriod: 30
+      enabled: false
+      maxReplicaCount: 10
+      minReplicaCount: 0
+      namespaceLabels: {}
+      pollingInterval: 5
+    kerberosSidecar:
+      enabled: false
+      resources: {}
+    labels: {}
+    livenessProbe:
+      command: null
+      enabled: true
+      failureThreshold: 5
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 20
+    logGroomerSidecar:
+      args:
+      - bash
+      - /clean-logs
+      command: null
+      resources: {}
+      retentionDays: 15
+    nodeSelector: {}
+    persistence:
+      annotations: {}
+      enabled: true
+      fixPermissions: false
+      size: 5Gi
+      storageClassName: null
+    podAnnotations: {}
+    priorityClassName: null
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: null
+    safeToEvict: true
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    strategy:
+      rollingUpdate:
+        maxSurge: 100%
+        maxUnavailable: 50%
+    terminationGracePeriodSeconds: 600
+    tolerations: []
+    topologySpreadConstraints: []
+    updateStrategy: null
+    waitForMigrations:
+      env: []
+
+    
+
+
+
+pg:
+  # Default values for Postgres354.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates
+  enabled: true
+  configmap:
+      database: test
+      user: root
+      password: root
+      port:  5432
+  persistence:
+    enabled: true
+    class: "longhorn"
+    reclaimpolicy: Delete
+    bindingmode: Immediate
+    accesmodes: ReadWriteOnce
+    storageallocation: 10Mi
+  replicaCount: 1
+  containerport: 5432
+  image:
+    repository: postgres:14-alpine
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:falsefalse
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  service:
+    type: ClusterIP
+    port: 5432  
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+# values for minio
+minio:
+  enabled: true
+    ## Provide a name in place of minio for `app:` labels
+  ##
+  nameOverride: ""
+
+  ## Provide a name to substitute for the full names of resources
+  ##
+  fullnameOverride: ""
+
+  ## set kubernetes cluster domain where minio is running
+  ##
+  clusterDomain: cluster.local
+
+  ## Set default image, imageTag, and imagePullPolicy. mode is used to indicate the
+  ##
+  image:
+    repository: quay.io/minio/minio
+    tag: RELEASE.2022-11-11T03-44-20Z
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  # - name: "image-pull-secret"
+
+  ## Set default image, imageTag, and imagePullPolicy for the `mc` (the minio
+  ## client used to create a default bucket).
+  ##
+  mcImage:
+    repository: quay.io/minio/mc
+    tag: RELEASE.2022-11-07T23-47-39Z
+    pullPolicy: IfNotPresent
+
+  ## minio mode, i.e. standalone or distributed
+  mode: distributed ## other supported values are "standalone"
+
+  ## Additional labels to include with deployment or statefulset
+  additionalLabels: {}
+
+  ## Additional annotations to include with deployment or statefulset
+  additionalAnnotations: {}
+
+  ## Typically the deployment/statefulset includes checksums of secrets/config,
+  ## So that when these change on a subsequent helm install, the deployment/statefulset
+  ## is restarted. This can result in unnecessary restarts under GitOps tooling such as
+  ## flux, so set to "true" to disable this behaviour.
+  ignoreChartChecksums: false
+
+  ## Additional arguments to pass to minio binary
+  extraArgs: []
+
+  ## Additional volumes to minio container
+  extraVolumes: []
+
+  ## Additional volumeMounts to minio container
+  extraVolumeMounts: []
+
+  ## Additional sidecar containers
+  extraContainers: []
+
+  ## Internal port number for MinIO S3 API container
+  ## Change service.port to change external port number
+  minioAPIPort: "9000"
+
+  ## Internal port number for MinIO Browser Console container
+  ## Change consoleService.port to change external port number
+  minioConsolePort: "9001"
+
+  ## Update strategy for Deployments
+  DeploymentUpdate:
+    type: RollingUpdate
+    maxUnavailable: 0
+    maxSurge: 100%
+
+  ## Update strategy for StatefulSets
+  StatefulSetUpdate:
+    updateStrategy: RollingUpdate
+
+  ## Pod priority settings
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
+  priorityClassName: ""
+
+  ## Pod runtime class name
+  ## ref https://kubernetes.io/docs/concepts/containers/runtime-class/
+  ##
+  runtimeClassName: ""
+
+  ## Set default rootUser, rootPassword
+  ## AccessKey and secretKey is generated when not set
+  ## Distributed MinIO ref: https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html
+  ##
+  rootUser: &sharedExistingrootUser "admin"
+  rootPassword: &sharedExistingrootPasswd "adminpassword"
+
+  ## Use existing Secret that store following variables:
+  ##
+  ## | Chart var             | .data.<key> in Secret    |
+  ## |:----------------------|:-------------------------|
+  ## | rootUser              | rootUser                 |
+  ## | rootPassword          | rootPassword             |
+  ##
+  ## All mentioned variables will be ignored in values file.
+  ## .data.rootUser and .data.rootPassword are mandatory,
+  ## others depend on enabled status of corresponding sections.
+  existingSecret: ""
+
+  ## Directory on the MinIO pof
+  certsPath: "/etc/minio/certs/"
+  configPathmc: "/etc/minio/mc/"
+
+  ## Path where PV would be mounted on the MinIO Pod
+  mountPath: "/export"
+  ## Override the root directory which the minio server should serve from.
+  ## If left empty, it defaults to the value of {{ .Values.mountPath }}
+  ## If defined, it must be a sub-directory of the path specified in {{ .Values.mountPath }}
+  ##
+  bucketRoot: ""
+
+  # Number of drives attached to a node
+  drivesPerNode: 1
+  # Number of MinIO containers running
+  replicas: 2
+  # Number of expanded MinIO clusters
+  pools: 1
+
+  ## TLS Settings for MinIO
+  tls:
+    enabled: false
+    ## Create a secret with private.key and public.crt files and pass that here. Ref: https://github.com/minio/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
+    certSecret: ""
+    publicCrt: public.crt
+    privateKey: private.key
+
+  ## Trusted Certificates Settings for MinIO. Ref: https://min.io/docs/minio/linux/operations/network-encryption.html#third-party-certificate-authorities
+  ## Bundle multiple trusted certificates into one secret and pass that here. Ref: https://github.com/minio/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
+  ## When using self-signed certificates, remember to include MinIO's own certificate in the bundle with key public.crt.
+  ## If certSecret is left empty and tls is enabled, this chart installs the public certificate from .Values.tls.certSecret.
+  trustedCertsSecret: ""
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    enabled: true
+    annotations: {}
+
+    ## A manually managed Persistent Volume and Claim
+    ## Requires persistence.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    existingClaim: ""
+
+    ## minio data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    ## Storage class of PV to bind. By default it looks for standard storage class.
+    ## If the PV uses a different storage class, specify that here.
+    storageClass: longhorn
+    VolumeName: ""
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+    ## If subPath is set mount a sub folder of a volume instead of the root of the volume.
+    ## This is especially handy for volume plugins that don't natively support sub mounting (like glusterfs).
+    ##
+    subPath: ""
+
+  ## Expose the MinIO service to be accessed from outside the cluster (LoadBalancer service).
+  ## or access it from within the cluster (ClusterIP service). Set the service type and the port to serve it.
+  ## ref: http://kubernetes.io/docs/user-guide/services/
+  ##
+  service:
+    type: ClusterIP
+    clusterIP: ~
+    port: "9000"
+    nodePort: 32000
+
+  ## Configure Ingress based on the documentation here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+
+  ingress:
+    enabled: false
+    # ingressClassName: ""
+    labels: {}
+      # node-role.kubernetes.io/ingress: platform
+
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/ingress.allow-http: "false"
+      # kubernetes.io/ingress.global-static-ip-name: ""
+      # nginx.ingress.kubernetes.io/secure-backends: "true"
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      # nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+    path: /
+    hosts:
+      - minio-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  consoleService:
+    type: NodePort
+    clusterIP: ~
+    port: "9001"
+    nodePort: 30001
+
+  consoleIngress:
+    enabled: false
+    # ingressClassName: ""
+    labels: {}
+      # node-role.kubernetes.io/ingress: platform
+
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/ingress.allow-http: "false"
+      # kubernetes.io/ingress.global-static-ip-name: ""
+      # nginx.ingress.kubernetes.io/secure-backends: "true"
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+      # nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+    path: /
+    hosts:
+      - console.minio-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+
+  ## Add stateful containers to have security context, if enabled MinIO will run as this
+  ## user and group NOTE: securityContext is only enabled if persistence.enabled=true
+  securityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
+
+  # Additational pod annotations
+  podAnnotations: {}
+
+  # Additional pod labels
+  podLabels: {}
+
+  ## Configure resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    requests:
+      memory: 16Gi
+
+  ## List of policies to be created after minio install
+  ##
+  ## In addition to default policies [readonly|readwrite|writeonly|consoleAdmin|diagnostics]
+  ## you can define additional policies with custom supported actions and resources
+  policies: []
+  ## writeexamplepolicy policy grants creation or deletion of buckets with name
+  ## starting with example. In addition, grants objects write permissions on buckets starting with
+  ## example.
+  # - name: writeexamplepolicy
+  #   statements:
+  #     - resources:
+  #         - 'arn:aws:s3:::example*/*'
+  #       actions:
+  #         - "s3:AbortMultipartUpload"
+  #         - "s3:GetObject"
+  #         - "s3:DeleteObject"
+  #         - "s3:PutObject"
+  #         - "s3:ListMultipartUploadParts"
+  #     - resources:
+  #         - 'arn:aws:s3:::example*'
+  #       actions:
+  #         - "s3:CreateBucket"
+  #         - "s3:DeleteBucket"
+  #         - "s3:GetBucketLocation"
+  #         - "s3:ListBucket"
+  #         - "s3:ListBucketMultipartUploads"
+  ## readonlyexamplepolicy policy grants access to buckets with name starting with example.
+  ## In addition, grants objects read permissions on buckets starting with example.
+  # - name: readonlyexamplepolicy
+  #   statements:
+  #     - resources:
+  #         - 'arn:aws:s3:::example*/*'
+  #       actions:
+  #         - "s3:GetObject"
+  #     - resources:
+  #         - 'arn:aws:s3:::example*'
+  #       actions:
+  #         - "s3:GetBucketLocation"
+  #         - "s3:ListBucket"
+  #         - "s3:ListBucketMultipartUploads"
+  ## conditionsexample policy creates all access to example bucket with aws:username="johndoe" and source ip range 10.0.0.0/8 and 192.168.0.0/24 only
+  # - name: conditionsexample
+  #   statements:
+  #     - resources:
+  #       - 'arn:aws:s3:::example/*'
+  #       actions:
+  #       - 's3:*'
+  #       conditions:
+  #         - StringEquals: '"aws:username": "johndoe"'
+  #         - IpAddress: |
+  #             "aws:SourceIp": [
+  #               "10.0.0.0/8",
+  #               "192.168.0.0/24"
+  #             ]
+  #
+  ## Additional Annotations for the Kubernetes Job makePolicyJob
+  makePolicyJob:
+    podAnnotations: {}
+    annotations: {}
+    securityContext:
+      enabled: false
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    resources:
+      requests:
+        memory: 128Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    # Command to run after the main command on exit
+    exitCommand: ""
+
+  ## List of users to be created after minio install
+  ##
+  users:
+    ## Username, password and policy to be assigned to the user
+    ## Default policies are [readonly|readwrite|writeonly|consoleAdmin|diagnostics]
+    ## Add new policies as explained here https://min.io/docs/minio/kubernetes/upstream/administration/identity-access-management.html#access-management
+    ## NOTE: this will fail if LDAP is enabled in your MinIO deployment
+    ## make sure to disable this if you are using LDAP.
+    - accessKey: console
+      secretKey: console123
+      policy: consoleAdmin
+    # Or you can refer to specific secret
+    #- accessKey: externalSecret
+    #  existingSecret: my-secret
+    #  existingSecretKey: password
+    #  policy: readonly
+
+  ## Additional Annotations for the Kubernetes Job makeUserJob
+  makeUserJob:
+    podAnnotations: {}
+    annotations: {}
+    securityContext:
+      enabled: false
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    resources:
+      requests:
+        memory: 128Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    # Command to run after the main command on exit
+    exitCommand: ""
+
+  ## List of service accounts to be created after minio install
+  ##
+  # svcaccts:
+    ## accessKey, secretKey and parent user to be assigned to the service accounts
+    ## Add new service accounts as explained here https://min.io/docs/minio/kubernetes/upstream/administration/identity-access-management/minio-user-management.html#service-accounts
+    # - accessKey: console-svcacct
+    #   secretKey: console123
+    #   user: console
+    ## Or you can refer to specific secret
+    # - accessKey: externalSecret
+    #   existingSecret: my-secret
+    #   existingSecretKey: password
+    #   user: console
+
+  makeServiceAccountJob:
+    podAnnotations: {}
+    annotations: {}
+    securityContext:
+      enabled: false
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    resources:
+      requests:
+        memory: 128Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    # Command to run after the main command on exit
+    exitCommand: ""
+
+  ## List of buckets to be created after minio install
+  ##
+  buckets:
+    #   # Name of the bucket
+    # - name: bucket1
+    #   # Policy to be set on the
+    #   # bucket [none|download|upload|public]
+    #   policy: none
+    #   # Purge if bucket exists already
+    #   purge: false
+    #   # set versioning for
+    #   # bucket [true|false]
+    #   versioning: false
+    #   # set objectlocking for
+    #   # bucket [true|false] NOTE: versioning is enabled by default if you use locking
+    #   objectlocking: false
+    # - name: bucket2
+    #   policy: none
+    #   purge: false
+    #   versioning: true
+    #   # set objectlocking for
+    #   # bucket [true|false] NOTE: versioning is enabled by default if you use locking
+    #   objectlocking: false
+
+  ## Additional Annotations for the Kubernetes Job makeBucketJob
+  makeBucketJob:
+    podAnnotations: {}
+    annotations: {}
+    securityContext:
+      enabled: false
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    resources:
+      requests:
+        memory: 128Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    # Command to run after the main command on exit
+    exitCommand: ""
+
+  ## List of command to run after minio install
+  ## NOTE: the mc command TARGET is always "myminio"
+  customCommands:
+    # - command: "admin policy set myminio consoleAdmin group='cn=ops,cn=groups,dc=example,dc=com'"
+
+  ## Additional Annotations for the Kubernetes Job customCommandJob
+  customCommandJob:
+    podAnnotations: {}
+    annotations: {}
+    securityContext:
+      enabled: false
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    resources:
+      requests:
+        memory: 128Mi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    # Command to run after the main command on exit
+    exitCommand: ""
+
+  ## Use this field to add environment variables relevant to MinIO server. These fields will be passed on to MinIO container(s)
+  ## when Chart is deployed
+  environment:
+    ## Please refer for comprehensive list https://min.io/docs/minio/linux/reference/minio-server/minio-server.html
+    ## MINIO_SUBNET_LICENSE: "License key obtained from https://subnet.min.io"
+    ## MINIO_BROWSER: "off"
+
+  ## The name of a secret in the same kubernetes namespace which contain secret values
+  ## This can be useful for LDAP password, etc
+  ## The key in the secret must be 'config.env'
+  ##
+  # extraSecret: minio-extraenv
+
+  ## OpenID Identity Management
+  ## The following section documents environment variables for enabling external identity management using an OpenID Connect (OIDC)-compatible provider.
+  ## See https://min.io/docs/minio/linux/operations/external-iam/configure-openid-external-identity-management.html for a tutorial on using these variables.
+  oidc:
+    enabled: false
+    configUrl: "https://identity-provider-url/.well-known/openid-configuration"
+    clientId: "minio"
+    clientSecret: ""
+    claimName: "policy"
+    scopes: "openid,profile,email"
+    redirectUri: "https://console-endpoint-url/oauth_callback"
+    # Can leave empty
+    claimPrefix: ""
+    comment: ""
+
+  networkPolicy:
+    enabled: false
+    allowExternal: true
+
+  ## PodDisruptionBudget settings
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ##
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+
+  ## Specify the service account to use for the MinIO pods. If 'create' is set to 'false'
+  ## and 'name' is left unspecified, the account 'default' will be used.
+  serviceAccount:
+    create: true
+    ## The name of the service account to use. If 'create' is 'true', a service account with that name
+    ## will be created.
+    name: "minio-sa"
+
+  metrics:
+    serviceMonitor:
+      enabled: false
+      # scrape each node/pod individually for additional metrics
+      includeNode: false
+      public: true
+      additionalLabels: {}
+      # for node metrics
+      relabelConfigs: {}
+      # for cluster metrics
+      relabelConfigsCluster: {}
+        # metricRelabelings:
+        #   - regex: (server|pod)
+        #     action: labeldrop
+      # namespace: monitoring
+      # interval: 30s
+      # scrapeTimeout: 10s
+
+  ## ETCD settings: https://github.com/minio/minio/blob/master/docs/sts/etcd.md
+  ## Define endpoints to enable this section.
+  etcd:
+    endpoints: []
+    pathPrefix: ""
+    corednsPathPrefix: ""
+    clientCert: ""
+    clientCertKey: ""
+
+trino:
+  # Default values for Trino.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  replicaCount: 1
+  hiveConnector: *hiveConnector
+
+  image: "trinodb/trino:355"
+  s3:
+    enabled: true
+    internal: true
+    rootUser: *sharedExistingrootUser
+    rootPassword: *sharedExistingrootPasswd 
+    datalakeProperties: ""
+    endpoint: ""
+
+  workers:
+    replicas: 1
+    storage: "2Gi"
+    resources: 
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+  coordinateur:
+    replicas: 1
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+
+  Hive:
+      # Default values for Hive-metastore.
+    # This is a YAML-formatted file.
+    # Declare variables to be passed into your templates.
+
+    replicaCount: 1
+
+    image: "team354/hivemetastore"
+    imagePullSecrets: []
+    nameOverride: ""
+    fullnameOverride: ""
+
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: ""
+
+    podAnnotations: {}
+
+    podSecurityContext: {}
+      # fsGroup: 2000
+
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    service:
+      type: ClusterIP
+      port: 80
+
+    ingress:
+      enabled: false
+      className: ""
+      annotations: {}
+        # kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+      hosts:
+        - host: chart-example.local
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls: []
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    nodeSelector: {}
+
+    tolerations: []
+
+    affinity: {}
+    enabled: false
+    binDirectory: /opt/apache-hive-metastore-3.0.0-bin
+    hadoopDirectory: /opt/hadoop-3.2.0
+    s3:
+      enabled: true
+      internal: true
+      rootUser: *sharedExistingrootUser
+      rootPassword: *sharedExistingrootPasswd 
+      coreSite: 
+          defaultFS: ""
+          endpoint: ""
+          pathStyleAccess: true
+          connectionSslEnabled: false
+          xmlContent: ""   # get this value if you don't use S3 or minio. For example GCS
+      metastore:
+          database: &sharedExistingdb "metadata"
+          port: &sharedExistingport "5432"
+          ConnectionUserName: &sharedExistinguser "hive"
+          ConnectionPassword: &sharedExistingpwd "hivepassword"
+
+    pg:
+      configmap:
+          database: *sharedExistingdb 
+          user: *sharedExistinguser 
+          password: *sharedExistingpwd 
+          port: *sharedExistingport 
+      persistence:
+        enabled: true
+        class: longhorn
+        reclaimpolicy: Delete
+        bindingmode: Immediate
+        accesmodes: ReadWriteOnce
+        storageallocation: 100Mi
+      replicaCount: 1
+      containerport: 5432
+      image:
+        repository: postgres:14-alpine
+        pullPolicy: IfNotPresent
+        # Overrides the image tag whose default is the chart appVersion.
+        tag: ""
+      imagePullSecrets: []
+      nameOverride: ""
+      fullnameOverride: ""
+      serviceAccount:
+        # Specifies whether a service account should be created
+        create: true
+        # Annotations to add to the service account
+        annotations: {}
+        # The name of the service account to use.
+        # If not set and create is true, a name is generated using the fullname template
+        name: ""
+
+      podAnnotations: {}
+
+      podSecurityContext: {}
+        # fsGroup: 2000
+
+      securityContext: {}
+        # capabilities:
+        #   drop:
+        #   - ALL
+        # readOnlyRootFilesystem: true
+        # runAsNonRoot: true
+        # runAsUser: 1000
+      service:
+        type: ClusterIP
+        port: 5432  
+      ingress:
+        enabled: false
+        className: ""
+        annotations: {}
+          # kubernetes.io/ingress.class: nginx
+          # kubernetes.io/tls-acme: "true"
+        hosts:
+          - host: chart-example.local
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        tls: []
+        #  - secretName: chart-example-tls
+        #    hosts:
+        #      - chart-example.local
+      resources: {}
+        # We usually recommend not to specify default resources and to leave this as a conscious
+        # choice for the user. This also increases chances charts run on environments with little
+        # resources, such as Minikube. If you do want to specify resources, uncomment the following
+        # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+        # limits:
+        #   cpu: 100m
+        #   memory: 128Mi
+        # requests:
+        #   cpu: 100m
+        #   memory: 128Mi
+
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 100
+        targetCPUUtilizationPercentage: 80
+        # targetMemoryUtilizationPercentage: 80
+
+      nodeSelector: {}
+
+      tolerations: []
+
+      affinity: {}
+
+

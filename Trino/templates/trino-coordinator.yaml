@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name}}-trino-coordinator
+spec:
+  replicas: {{ .Values.coordinateur.replicas}}
+  selector:
+    matchLabels:
+      app: trino-coordinator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: trino-coordinator
+    spec:
+      containers:
+      - name: trino
+        image: {{ .Values.image}}
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: {{ .Values.coordinateur.resources.requests.cpu}}      #"1000m"
+            memory: {{ .Values.coordinateur.resources.requests.memory}}  #2Gi
+          limits:
+            cpu: {{ .Values.coordinateur.resources.limits.cpu}}  
+            memory: {{ .Values.coordinateur.resources.limits.memory}} 
+        volumeMounts:
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/jvm.config
+          subPath: jvm.config
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/config.properties
+          subPath: config.properties.coordinator
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/node.properties
+          subPath: node.properties
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/catalog/hive.properties
+          subPath: hive.properties
+        - name: trino-cfg-vol
+          mountPath: /etc/trino/catalog/iceberg.properties
+          subPath: iceberg.properties        
+      volumes:
+        - name: trino-cfg-vol
+          configMap:
+            name: {{ .Release.Name}}-trino-configs

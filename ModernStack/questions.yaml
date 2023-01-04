@@ -1,0 +1,281 @@
+rancher_min_version: 2.6.9
+questions:
+- variable: pg.enabled
+  label: enabled postgres
+  description: Add or not postgresql into the stack
+  type: boolean
+  required: true
+  default: false
+  group: postgresql
+  show_subquestion_if: true
+  subquestions:
+    - variable: pg.persistence.class
+      label: Storage Class
+      default: "longhorn"
+    - variable: pg.persistence.storageallocation
+      label: Storage 
+      default: "10Mi"
+    - variable: pg.configmap.database
+      label: Database
+      description: default db to create 
+      default: "default-db"
+    - variable: pg.configmap.user
+      label: User
+      description: default user to create 
+      default: "default-user"
+    - variable: pg.configmap.password
+      label: Password
+      description: default user to create 
+      default: "default-pwd"
+    - variable: pg.image.repository
+      label: Image repository
+      description: postgres image to use 
+      default: "postgres:14-alpine"
+    - variable: pg.image.pullPolicy
+      label: Pull Policy
+      description: postgres image pull policy 
+      default: "IfNotPresent"
+    - variable: pg.service.type
+      label: Service
+      description: postgres image pull policy 
+      type: enum
+      options: 
+      - "ClusterIP"
+      - "NodePort"
+      - "LoadBalancer"
+      default: "ClusterIP"
+    - variable: pg.resource.limits.cpu
+      label: CPU limit
+      description: limit of CPU
+    - variable: pg.resource.limits.memory
+      label: memory limit
+      description: limit of memory
+    - variable: pg.resource.requests.cpu
+      label: CPU request
+      description: request of CPU
+    - variable: pg.resource.requests.memory
+      label: memory request
+      description: request of memory
+     
+- variable: airflow.enabled
+  label: enabled airflow
+  description: add or not airflow into the stack
+  type: boolean
+  required: true
+  default: false
+  group: airflow
+  show_subquestion_if: true
+  subquestions:
+    - variable: airflow.workers.replicas
+      label: workers
+      description: number of airflow workers
+      type: int
+      default: 2
+    - variable: airflow.dags.gitSync.enabled
+      label: Enabled git
+      description: active git synchronization
+      type: boolean
+      default: false
+    - variable: airflow.dags.gitSync.branch
+      label: Git branch
+      description: git branch for dags
+      required: true
+      show_if: "airflow.dags.gitSync.enabled=true"
+    - variable: airflow.dags.gitSync.repo
+      label: Git repo
+      description: git repo for dags
+      required: true
+      show_if: "airflow.dags.gitSync.enabled=true"
+    - variable: airflow.dags.gitSync.sshKeySecret
+      label: sshKeySecret
+      description: existant synchronization ssh key secret
+      required: true
+      show_if: "airflow.dags.gitSync.enabled=true"
+    - variable: airflow.dags.gitSync.subPath
+      label: subPath
+      description: repo sub path
+      required: true
+      show_if: "airflow.dags.gitSync.enabled=true"
+    - variable: airflow.images.airflow.repository
+      label: airflow image repo
+      required: true
+    - variable: airflow.images.airflow.tag
+      label: airflow image tag
+      required: true
+    - variable: airflow.images.airflow.pullPolicy
+      label: airflow image pull policy
+      required: true
+      default: "IfNotPresent"
+- variable: minio.enabled
+  label: enabled minio
+  description: add or not minio into the stack
+  type: boolean
+  required: false
+  default: false
+  group: minio
+  show_subquestion_if: "true"
+  subquestions:
+    - variable: minio.rootUser
+      label: minio root user
+      description: root user 
+      required: true
+    - variable: minio.rootPassword
+      label: minio root password
+      description: root password 
+      required: true
+    - variable: minio.replicas
+      label: minio replicas 
+      type: int
+      required: true
+      default: 2
+    - variable: minio.persistence.size
+      label: minio volume size 
+      required: true
+      default: 10Gi
+    - variable: minio.consoleService.type
+      label: minio console service type 
+      type: enum
+      options: 
+      - "ClusterIP"
+      - "NodePort"
+      - "LoadBalancer"
+      default: "NodePort"
+      required: true
+    - variable: minio.consoleService.nodePort
+      label: minio console service node port
+      required: true
+      default: 30001
+      type: int
+- variable: trino.enabled
+  label: enabled trino
+  description: add or not trino into the stack
+  type: boolean
+  required: true
+  default: false
+  group: trino
+  show_subquestion_if: "true"
+  subquestions:
+    - variable: trino.workers.replicas
+      label: workers
+      description: number of workers
+      group: Workers
+      type: int
+      required: true
+      default: 2
+    - variable: trino.workers.storage
+      label: workers storage
+      description: workers volume 
+      group: Workers
+      required: true
+      default: "2Gi"
+    - variable: trino.workers.resources.requests.cpu
+      label: workers CPU requests
+      group: Workers
+      required: false
+      default: "1000m"
+    - variable: trino.workers.resources.requests.memory
+      label: workers memory requests
+      required: false
+      group: Workers
+      default: "2Gi"
+    - variable: trino.workers.resources.limits.cpu
+      label: workers CPU limits
+      required: false
+      group: Workers
+      default: "1000m"
+    - variable: trino.workers.resources.limits.memory
+      label: workers memory limits
+      required: false
+      group: Workers
+      default: "2Gi"
+    
+    - variable: trino.coordinateur.replicas
+      label: coordinators
+      description: number of coordinators
+      group: Coordinators
+      type: int
+      required: true
+      default: 2
+    - variable: trino.coordinateur.resources.requests.cpu
+      label: coordinators CPU requests
+      group: coordinators
+      required: false
+      default: "1000m"
+    - variable: trino.coordinateur.resources.requests.memory
+      label: coordinators memory requests
+      required: false
+      group: coordinators
+      default: "2Gi"
+    - variable: trino.coordinateur.resources.limits.cpu
+      label: coordinators CPU limits
+      required: false
+      group: coordinators
+      default: "1000m"
+    - variable: trino.coordinateur.resources.limits.memory
+      label: coordinators memory limits
+      required: false
+      group: coordinators
+      default: "2Gi"
+
+    - variable: HiveConnector
+      label: HiveMetastore
+      description: use hive connector
+      type: boolean
+      required: true
+      default: true
+    - variable: trino.s3.enabled
+      label: S3/minio
+      type: boolean
+      required: false
+      default: true
+      show_if: "HiveConnector=true"
+    - variable: trino.s3.internal
+      label: intern minio
+      type: boolean
+      required: false
+      default: true
+      show_if: "trino.s3.enabled=true"
+    - variable: trino.s3.datalakeProperties
+      label: datalakeProperties
+      required: true
+      default: true
+      show_if: "trino.s3.enabled=false"
+    - variable: trino.Hive.s3.xmlContent
+      label: Hive CoreSite.xml
+      required: true
+      default: true
+      show_if: "trino.s3.enabled=false"
+    - variable: trino.Hive.s3.defaultFS
+      label: Hive defaultFS
+      required: true
+      default: true
+      show_if: "trino.s3.internal=false"
+    - variable: trino.s3.endpoint
+      label: datalakeProperties
+      required: true
+      default: true
+      show_if: "trino.s3.internal=false"
+   
+- variable: fluentbit.fluentdHost
+  label: fluentd host
+  required: true
+  group: monitoring
+- variable: fluentbit.fluentdPort
+  label: fluentd port
+  required: true
+  default: 24224
+  group: monitoring      
+- variable: airflow.elasticsearch.connection.host
+  label: loki or elasticsearch host
+  required: true
+  group: monitoring
+  show_if: "airflow.enabled=true"
+- variable: airflow.elasticsearch.connection.port
+  label: loki or elasticsearch Port
+  required: true
+  default: 3100
+  group: monitoring      
+
+
+
+  
