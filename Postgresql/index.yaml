@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  Postgres354:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-12-19T11:18:27.80347689Z"
+    description: A Helm chart for Kubernetes
+    digest: df86fdba26318b0c68f838e697f8bcff1f4fb6f9f79ab457ecd30e7aefdccf9c
+    name: Postgres354
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/postgreschart/Postgres354-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-11-14T18:31:12.831207998Z"
+    description: A Helm chart for Kubernetes
+    digest: 2bb0af32458698a6f09875a9144b26d0486f96ed56f5108ea0518dcec1b51baa
+    name: Postgres354
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/postgreschart/Postgres354-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-12-19T11:18:27.802659281Z"

@@ -1,0 +1,16 @@
+{{- if eq .Values.persistence.enabled true}}
+apiVersion: v1
+kind: PersistentVolumeClaim # Create PVC
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.component}}-pg-pvc
+spec:
+  storageClassName: {{ .Values.persistence.class}}
+  {{- with .Values.persistence}}
+  accessModes: 
+    - {{ .accesmodes | quote}}
+  resources:
+    requests:
+      storage: {{ .storageallocation | quote}} # Sets volume size
+  {{- end}}
+      
+{{- end}}

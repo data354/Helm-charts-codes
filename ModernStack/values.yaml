@@ -86,6 +86,7 @@ fluentbit:
   fluentdPort: 24224 
 
 airflow:
+  # all values about airflow
   enabled: true
   affinity: {}
   airflowConfigAnnotations: {}

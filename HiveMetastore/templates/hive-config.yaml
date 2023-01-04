@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "{{ .Release.Name}}-hive-config"
-{{- if .Values.s3.enabled}}
+{{- if .Values.s3.enabled}} 
 {{- if .Values.s3.internal}}
 data: 
   core-site.xml: |
