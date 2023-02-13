@@ -46,4 +46,3 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-{{ .Values.component}}-pg-pvc
 {{- end}}
-password

@@ -12,6 +12,7 @@ spec:
    {{- if eq .Values.service.type "NodePort" }}
      nodePort: 30002
    {{- end}}
-
   selector:
    app: postgres
+
+

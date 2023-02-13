@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-{{ .Values.component}}-pg-config
 data:
-  POSTGRES_DB: {{ .Values.configmap.database | quote}}
-  POSTGRES_USER: {{ .Values.configmap.user | quote}}
-  POSTGRES_PASSWORD: {{ .Values.configmap.password | quote }}
+  POSTGRES_DB: {{ .Values.access.database | quote}}
+  POSTGRES_USER: {{ .Values.access.user | quote}}
+  POSTGRES_PASSWORD: {{ .Values.access.password | quote }}

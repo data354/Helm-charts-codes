@@ -1,22 +1,24 @@
+#############################################
 # Default values for Postgres354.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 component: bd
-configmap:
+replicaCount: 1
+containerport: 5432
+
+access:
   database: test
   user: test
   password: test
   port: 5432
+
 persistence:
   enabled: true
   class: null
   reclaimpolicy: Delete
   bindingmode: Immediate
   accesmodes: ReadWriteOnce
-  storageallocation: 10Mi
-
-replicaCount: 1
-containerport: 5432
+  storageallocation: 100Mi
 image:
   repository: postgres:14-alpine
   pullPolicy: IfNotPresent
@@ -52,6 +54,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 5432
+
 ingress:
   enabled: false
   className: ""
@@ -92,5 +95,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-
