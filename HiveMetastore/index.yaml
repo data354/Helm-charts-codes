@@ -3,15 +3,31 @@ entries:
   HiveMetastore:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-20T20:41:58.570646135Z"
+    created: "2023-02-15T13:58:28.747591145Z"
+    dependencies:
+    - alias: pg
+      name: Postgres354
+      repository: https://data354.github.io/Helmschart354/postgreschart/
+      version: 0.2.0
     description: A Helm chart for Kubernetes
-    digest: 384cc018cb7014675621fa96b4759d9581ece234f80ff9634789c7715a71c848
+    digest: a6fa888c285ca0f214988229252ba94058925964603f9b7fe50081fa51570fdd
     maintainers:
     - name: Data354
       url: https://www.data354.com/
     name: HiveMetastore
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/HiveMetastore/HiveMetastore-0.2.0.tgz
+    - https://data354.github.io/Helmschart354/HiveMetastore/HiveMetastore-0.3.0.tgz
+    version: 0.3.0
+  Postgres354:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-02-15T13:58:28.748205957Z"
+    description: A Helm chart for Kubernetes
+    digest: bec632cbeb448c2343d93068fa8290edf8f59d5a5c42926184dcd6a687684d1a
+    name: Postgres354
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/HiveMetastore/charts/Postgres354-0.2.0.tgz
     version: 0.2.0
-generated: "2022-12-20T20:41:58.569740085Z"
+generated: "2023-02-15T13:58:28.745772622Z"
