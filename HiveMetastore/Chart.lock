@@ -1,0 +1,6 @@
+dependencies:
+- name: Postgres354
+  repository: https://data354.github.io/Helmschart354/postgreschart/
+  version: 0.2.0
+digest: sha256:9283dfc9c561b66515d44cf272250a0796409c08269e3b9c40cbe57e6f2c9c57
+generated: "2023-02-15T10:44:08.942707193Z"

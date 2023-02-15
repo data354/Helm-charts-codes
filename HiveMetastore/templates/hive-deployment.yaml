@@ -16,7 +16,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: metastore
-        image:  {{ .Values.image}}            
+        image:  {{ .Values.image.repository}}           
         ports:
         - containerPort: 9083
         volumeMounts:

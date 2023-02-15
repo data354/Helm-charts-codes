@@ -7,9 +7,9 @@ spec:
     spec:
       containers:
         - name: hivemetastore
-          image: {{ .Values.image}}                    #gcr.io/project-yasmine/hivemetastore:2.0
+          image: {{ .Values.image.repository}}                    #gcr.io/project-yasmine/hivemetastore:2.0
           command: [{{  .Values.binDirectory}}/bin/schematool]                 #["/opt/apache-hive-metastore-3.0.0-bin/bin/schematool"]
-          args: ["--verbose" ,"-initSchema" , "-dbType", "postgres" , "-driver", "org.postgresql.Driver", "-userName", hive, 
-            "-passWord", password , "-force", "true", "-url", "jdbc:postgresql://{{ .Release.Name }}-pg-metastore-svc:5432/metadata?createDatabaseIfNotExist=true&connectTimeout=2000"]
+          args: ["--verbose" ,"-initSchema" , "-dbType", "postgres" , "-driver", "org.postgresql.Driver", "-userName", "{{ .Values.pg.access.user}}", 
+            "-passWord", "{{ .Values.pg.access.password}}" , "-url", "jdbc:postgresql://{{ .Release.Name }}-{{ .Values.pg.component}}-pg-service:{{ .Values.pg.access.port}}/{{ .Values.pg.access.database}}?createDatabaseIfNotExist=true&connectTimeout=2000"]
       restartPolicy: Never
   backoffLimit: 20
