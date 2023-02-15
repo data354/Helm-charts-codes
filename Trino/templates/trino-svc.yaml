@@ -3,13 +3,16 @@ kind: Service
 metadata:
   name: {{ .Release.Name}}-trino-svc
   namespace: {{ .Release.Namespace}}
+  labels: 
+    app: trino-coordinator
 spec:
+  type: {{ .Values.service.type}}
   ports:
-  - name: http
-    port: 8080
-    protocol: TCP
-    targetPort: http
-    nodePort: 30003
+   - port: {{ .Values.service.port}}
+     targetPort: 8080
+     {{- if eq .Values.service.type "NodePort"}}
+     nodePort: {{ .Values.service.nodeport}}
+     {{- end}}
   selector:
     app: trino-coordinator
-  type: NodePort
+  

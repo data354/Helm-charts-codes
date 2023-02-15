@@ -2,36 +2,33 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
-hiveConnector: true
+hiveConnector: true # true if Trino need hiveconnector or false
 
-image: trinodb/trino:355
+replicaCount: 1
+image: 
+  repository: trinodb/trino:355
+  tag: ""
 s3:
-  enabled: true
-  internal: true
-  rootUser: ""
-  rootPassword: ""
   datalakeProperties: ""
   endpoint: ""
-
 workers:
-  replicas: 1
+  replicas: 2
   storage: "2Gi"
   resources: 
     requests:
-      cpu: "1000m"
+      cpu: "50m"  #"1000m"
       memory: "2Gi"
     limits:
-      cpu: "1000m"
+      cpu: "50m"  #"1000m"
       memory: "2Gi"
 coordinateur:
   replicas: 1
   resources:
     requests:
-      cpu: "1000m"
+      cpu:  "50m"  #"1000m"
       memory: "2Gi"
     limits:
-      cpu: "1000m"
+      cpu: "50m"   #"1000m"
       memory: "2Gi"
 
 imagePullSecrets: []
@@ -61,8 +58,10 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 80
+  type: NodePort     #or ClusterIp
+  port: 8080
+  nodeport: 30002
+
 
 ingress:
   enabled: false
@@ -112,8 +111,10 @@ Hive:
   # Declare variables to be passed into your templates.
 
   replicaCount: 1
-
-  image: team354/hivemetastore
+  image:
+    repository: team354/hivemetastore
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
@@ -184,12 +185,13 @@ Hive:
   tolerations: []
 
   affinity: {}
-  enabled: false
+
+  #enabled: false
   binDirectory: /opt/apache-hive-metastore-3.0.0-bin
   hadoopDirectory: /opt/hadoop-3.2.0
   s3:
-    enabled: true
-    internal: true
+    enabled: true # true if connect minio or s3. False elif connect other storage like GCS, ...
+    internal: true # true if connect with minio deploy with stack
     rootUser: root
     rootPassword: root
     coreSite: 
@@ -199,18 +201,26 @@ Hive:
         connectionSslEnabled: false
         xmlContent: ""   # get this value if you don't use S3 or minio. For example GCS
     metastore:
-        database: &sharedExistingdb "metadata"
-        port: &sharedExistingport "5432"
-        ConnectionUserName: &sharedExistinguser "hive"
-        ConnectionPassword: &sharedExistingpwd "hivepassword"
+        database: &sharedExistingdb metadata
+        port: &sharedExistingport 5432
+        ConnectionUserName: &sharedExistinguser hive
+        ConnectionPassword: &sharedExistingpwd hivepassword
 
   pg:
+    #############################################
+  # Default values for Postgres354.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
     component: metastore
-    configmap:
-        database: *sharedExistingdb 
-        user: *sharedExistinguser 
-        password: *sharedExistingpwd 
-        port: *sharedExistingport 
+    replicaCount: 1
+    containerport: 5432
+
+    access:
+      database: *sharedExistingdb 
+      user: *sharedExistinguser 
+      password: *sharedExistingpwd 
+      port: *sharedExistingport
+
     persistence:
       enabled: true
       class: null
@@ -218,16 +228,16 @@ Hive:
       bindingmode: Immediate
       accesmodes: ReadWriteOnce
       storageallocation: 100Mi
-    replicaCount: 1
-    containerport: 5432
     image:
       repository: postgres:14-alpine
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
+
     imagePullSecrets: []
     nameOverride: ""
     fullnameOverride: ""
+
     serviceAccount:
       # Specifies whether a service account should be created
       create: true
@@ -249,9 +259,11 @@ Hive:
       # readOnlyRootFilesystem: true
       # runAsNonRoot: true
       # runAsUser: 1000
+
     service:
       type: ClusterIP
-      port: 5432  
+      port: 5432
+
     ingress:
       enabled: false
       className: ""
@@ -267,6 +279,7 @@ Hive:
       #  - secretName: chart-example-tls
       #    hosts:
       #      - chart-example.local
+
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
       # choice for the user. This also increases chances charts run on environments with little
@@ -291,4 +304,5 @@ Hive:
     tolerations: []
 
     affinity: {}
+
 

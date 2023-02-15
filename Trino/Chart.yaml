@@ -24,7 +24,7 @@ version: 0.2.0
 appVersion: "1.16.0"
 dependencies:
   - name: HiveMetastore
-    version: "0.2.0"
+    version: "0.3.0"
     repository: "https://data354.github.io/Helmschart354/HiveMetastore"
     #condition: HiveMetastore.enabled
     tags: 

@@ -11,5 +11,5 @@ dependencies:
 - name: Trino
   repository: https://data354.github.io/Helmschart354/Trino
   version: 0.2.0
-digest: sha256:0bfb6daadb3633f438ea382328641fca631d19a0efbc94e68cdf6775ced182ff
-generated: "2022-12-22T11:54:25.492405415Z"
+digest: sha256:a237c83ebe8f151e334c8b0c3bd04b37517bc338e90556201384db47d8643dc0
+generated: "2023-02-15T16:52:22.444989843Z"

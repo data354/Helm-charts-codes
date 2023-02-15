@@ -28,5 +28,4 @@ spec:
     tier: airflow
   sessionAffinity: None
   type: NodePort
-
 {{end}}

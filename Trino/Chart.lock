@@ -1,6 +1,6 @@
 dependencies:
 - name: HiveMetastore
   repository: https://data354.github.io/Helmschart354/HiveMetastore
-  version: 0.2.0
-digest: sha256:11229627122c316447a85bfcb946237b50d82f009bb6215035658dd9ca58bec9
-generated: "2022-12-21T09:30:02.583443958Z"
+  version: 0.3.0
+digest: sha256:e2ba4e8ac9b045e32594496150a47f135c60470c06a8eda04dca64642aacb1a8
+generated: "2023-02-15T14:04:24.530540748Z"

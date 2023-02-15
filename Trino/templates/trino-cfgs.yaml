@@ -33,21 +33,21 @@ data:
     query.max-memory=4GB
     query.max-memory-per-node=1GB
     memory.heap-headroom-per-node=1GB
-    discovery.uri=http://{{ .Release.Name}}-trino:8080
+    discovery.uri=http://{{ .Release.Name}}-trino-svc:8080
   node.properties: |-
     node.environment=production
     protocol.v1.alternate-header-name=Presto
     spiller-spill-path=/tmp
     node.data-dir=/data/trino
     plugin.dir=/usr/lib/trino/plugin
-  {{- if .Values.s3.enabled }}
-  {{- if .Values.s3.internal}}
+  {{- if .Values.Hive.s3.enabled }}
+  {{- if .Values.Hive.s3.internal}}
   hive.properties: |-
     connector.name=hive-hadoop2
     hive.metastore.uri=thrift://{{ .Release.Name}}-hive-svc:9083
     hive.max-partitions-per-scan=1000000
-    hive.s3.aws-access-key={{ .Values.s3.rootUser}}
-    hive.s3.aws-secret-key={{ .Values.s3.rootPassword}}
+    hive.s3.aws-access-key={{ .Values.Hive.s3.rootUser}}
+    hive.s3.aws-secret-key={{ .Values.Hive.s3.rootPassword}}
     hive.s3.endpoint={{ .Release.Name}}-minio:9000
     hive.s3select-pushdown.enabled=true
     hive.s3.ssl.enabled=false
@@ -64,8 +64,8 @@ data:
     connector.name=hive-hadoop2
     hive.metastore.uri=thrift://{{ .Release.Name}}-hive-svc:9083
     hive.max-partitions-per-scan=1000000
-    hive.s3.aws-access-key={{ .Values.s3.rootUser}}
-    hive.s3.aws-secret-key={{ .Values.s3.rootPassword}}
+    hive.s3.aws-access-key={{ .Values.Hive.s3.rootUser}}
+    hive.s3.aws-secret-key={{ .Values.Hive.s3.rootPassword}}
     hive.s3.endpoint= {{ .Values.s3.endpoint}}
     hive.s3select-pushdown.enabled=true
     hive.s3.ssl.enabled=false

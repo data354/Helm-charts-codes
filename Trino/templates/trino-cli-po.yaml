@@ -6,6 +6,6 @@ metadata:
 spec:
   containers:
   - name: {{ .Release.Name}}-trino-cli
-    image: {{ .Values.image}}
+    image: {{ .Values.image.repository}}
     command: ["tail", "-f", "/dev/null"]
   restartPolicy: Always

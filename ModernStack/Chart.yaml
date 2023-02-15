@@ -28,8 +28,6 @@ dependencies: # A list of the chart requirements (optional)
     version: "0.2.0"
     repository: "https://data354.github.io/Helmschart354/postgreschart/"
     condition: pg.enabled
-    tags:
-      - hiveConnector
     alias: pg
 
   - name: airflow
