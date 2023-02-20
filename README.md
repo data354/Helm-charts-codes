@@ -3,6 +3,8 @@
 ## INSTALLATION
 
 helm repo add datastack https://data354.github.io/Helmschart354/datastack/
+
+
 helm install $release_name datastack/modernstack --set pg.enabled=true,minio.enabled=true,airflow.enabled=false,trino.enabled=false --debug
 
 ## DESCRIPTION
