@@ -166,7 +166,6 @@ data:
                 <name>fs.s3a.access.key</name>
                 <value>{{ .Values.s3.rootUser}}</value>
             </property>
-
             <property>
                 <name>fs.s3a.secret.key</name>
                 <value>{{ .Values.s3.rootPassword}}</value>

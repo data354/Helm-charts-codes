@@ -291,7 +291,7 @@ airflow:
       accessMode: ReadWriteOnce
       enabled: false
       existingClaim: null
-      size: 1Gi #5Gi
+      size: 5Gi
       storageClassName: null
       subPath: null
   data:
@@ -1101,7 +1101,7 @@ airflow:
       annotations: {}
       enabled: true
       fixPermissions: false
-      size: 50Mi #50Gi
+      size: 50Gi
       storageClassName: null #longhorn
     podAnnotations: {}
     priorityClassName: null
@@ -1146,7 +1146,7 @@ pg:
     reclaimpolicy: Delete
     bindingmode: Immediate
     accesmodes: ReadWriteOnce
-    storageallocation: 10Mi
+    storageallocation: 500Mi
   replicaCount: 1
   containerport: 5432
   image:
@@ -1385,7 +1385,7 @@ minio:
     storageClass: null
     VolumeName: ""
     accessMode: ReadWriteOnce
-    size: 50Mi #5Gi
+    size: 5Gi
 
     ## If subPath is set mount a sub folder of a volume instead of the root of the volume.
     ## This is especially handy for volume plugins that don't natively support sub mounting (like glusterfs).
@@ -1794,19 +1794,19 @@ trino:
     storage: "2Gi"
     resources: 
       requests:
-        cpu: "50m"  #"1000m"
+        cpu: "1000m"
         memory: "2Gi"
       limits:
-        cpu: "50m"  #"1000m"
+        cpu: "1000m"
         memory: "2Gi"
   coordinateur:
     replicas: 1
     resources:
       requests:
-        cpu:  "50m"  #"1000m"
+        cpu:  "1000m"
         memory: "2Gi"
       limits:
-        cpu: "50m"   #"1000m"
+        cpu: "1000m"
         memory: "2Gi"
 
   imagePullSecrets: []

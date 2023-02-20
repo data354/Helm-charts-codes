@@ -3,35 +3,45 @@ entries:
   Postgres354:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-01-02T20:45:55.465407055Z"
+    created: "2023-02-17T15:25:59.991775555Z"
     description: A Helm chart for Kubernetes
-    digest: df86fdba26318b0c68f838e697f8bcff1f4fb6f9f79ab457ecd30e7aefdccf9c
+    digest: bec632cbeb448c2343d93068fa8290edf8f59d5a5c42926184dcd6a687684d1a
     name: Postgres354
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/charts/Postgres354-0.2.0.tgz
+    - https://data354.github.io/Helmschart354/datastack/charts/Postgres354-0.2.0.tgz
     version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-12-16T12:11:00.199264696Z"
+    description: A Helm chart for Kubernetes
+    digest: f2586a65f70830001a98d04f752b94921ad4879c73b0677cabfa819b061b4deb
+    name: Postgres354
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/Postgres354-0.1.0.tgz
+    version: 0.1.0
   Trino:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-01-02T20:45:55.466625447Z"
+    created: "2023-02-17T15:25:59.993703286Z"
     dependencies:
     - alias: Hive
       name: HiveMetastore
       repository: https://data354.github.io/Helmschart354/HiveMetastore
       tags:
       - hiveConnector
-      version: 0.2.0
+      version: 0.3.0
     description: A Helm chart for Kubernetes
-    digest: 92678a70e83aad18ded68c0cf86a9749c8ebac23c7b5476e1075c29424245d53
+    digest: b2fb8ecfcc7a73dd70e0ef661be263984abc85233a3600e3ff85d1d1bf7d11dc
     name: Trino
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/charts/Trino-0.2.0.tgz
+    - https://data354.github.io/Helmschart354/datastack/charts/Trino-0.2.0.tgz
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-22T11:04:38.793446667Z"
+    created: "2022-12-16T12:11:00.202120156Z"
     dependencies:
     - alias: Hive
       name: HiveMetastore
@@ -40,11 +50,11 @@ entries:
       - hiveConnector
       version: 0.1.0
     description: A Helm chart for Kubernetes
-    digest: 0c4de73b08e073983ac154b3d59d3a9a17d0d2de3dbc986f45d2e9b715348ffb
+    digest: 68ae856d4d3f38228e78387411b8c1c9b6d6f3e71db6d95300d4d82687d21030
     name: Trino
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/charts/Trino-0.1.0.tgz
+    - https://data354.github.io/Helmschart354/datastack/charts/Trino-0.1.0.tgz
     version: 0.1.0
   airflow:
   - annotations:
@@ -259,7 +269,7 @@ entries:
           url: https://airflow.apache.org/docs/apache-airflow/2.4.1/_images/context.png
     apiVersion: v2
     appVersion: 2.4.1
-    created: "2023-01-02T20:45:55.478427099Z"
+    created: "2023-02-17T15:26:00.004303761Z"
     dependencies:
     - condition: postgresql.enabled
       name: postgresql
@@ -283,12 +293,12 @@ entries:
     - https://github.com/apache/airflow
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/charts/airflow-1.7.0.tgz
+    - https://data354.github.io/Helmschart354/datastack/charts/airflow-1.7.0.tgz
     version: 1.7.0
   minio:
   - apiVersion: v1
     appVersion: RELEASE.2022-11-11T03-44-20Z
-    created: "2023-01-02T20:45:55.480641171Z"
+    created: "2023-02-17T15:26:00.005935721Z"
     description: Multi-Cloud Object Storage
     digest: 3e952c5d737980b8ccdfb819021eafb4b4e8da226f764a1dc3de1ba63ceb1ffa
     home: https://min.io
@@ -306,19 +316,17 @@ entries:
     sources:
     - https://github.com/minio/minio
     urls:
-    - https://data354.github.io/Helmschart354/Stack/charts/minio-5.0.1.tgz
+    - https://data354.github.io/Helmschart354/datastack/charts/minio-5.0.1.tgz
     version: 5.0.1
   modernstack:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-01-02T20:45:55.464900693Z"
+    created: "2023-02-17T15:25:59.9912871Z"
     dependencies:
     - alias: pg
       condition: pg.enabled
       name: Postgres354
       repository: https://data354.github.io/Helmschart354/postgreschart/
-      tags:
-      - hiveConnector
       version: 0.2.0
     - condition: airflow.enabled
       name: airflow
@@ -335,30 +343,30 @@ entries:
       repository: https://data354.github.io/Helmschart354/Trino
       version: 0.2.0
     description: A Helm chart for Kubernetes
-    digest: 5d87713f56bdccaddcf1d16df792b74c51fc8a1f460566e67de9fc4f8087ffc5
+    digest: 2a3eaae1fdb8c965ff5d8c8987959f4c7ca1fd746116322654a10a2afe0228f0
     maintainers:
     - name: Data354
       url: https://www.data354.com/
     name: modernstack
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/modernstack-1.0.0.tgz
+    - https://data354.github.io/Helmschart354/datastack/modernstack-1.0.0.tgz
     version: 1.0.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-22T11:04:38.79131663Z"
+    created: "2022-12-16T12:11:00.198463738Z"
     dependencies:
-    - alias: pg
-      condition: pg.enabled
-      name: Postgres354
-      repository: https://data354.github.io/Helmschart354/postgreschart/
-      tags:
-      - hiveConnector
-      version: 0.2.0
     - condition: airflow.enabled
       name: airflow
       repository: https://airflow.apache.org
       version: 1.7.0
+    - alias: pg
+      condition: pg.enabled
+      name: Postgres354
+      repository: https://data354.github.io/Helmschart354/
+      tags:
+      - hiveConnector
+      version: 0.1.0
     - alias: minio
       condition: minio.enabled
       name: minio
@@ -370,13 +378,13 @@ entries:
       repository: https://data354.github.io/Helmschart354/Trino
       version: 0.1.0
     description: A Helm chart for Kubernetes
-    digest: d1562217b5629e65735df092e5f05088632b7f2b380a3c73daad9d51d47e47e7
+    digest: 9bca85d43ffa3a25279fbe07705bd969e99c5d974c1739cd2e4afa625e346752
     maintainers:
     - name: Data354
       url: https://www.data354.com/
     name: modernstack
     type: application
     urls:
-    - https://data354.github.io/Helmschart354/Stack/modernstack-0.5.0.tgz
-    version: 0.5.0
-generated: "2023-01-02T20:45:55.439253803Z"
+    - https://data354.github.io/Helmschart354/datastack/modernstack-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-02-17T15:25:59.962310051Z"

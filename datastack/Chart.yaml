@@ -31,7 +31,7 @@ dependencies: # A list of the chart requirements (optional)
     # import-values: # (optional)
     #   - ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items.
   - name: Postgres354
-    version: "0.1.0"
+    version: "0.2.0"
     repository: "https://data354.github.io/Helmschart354/"
     condition: pg.enabled
     tags:
@@ -45,7 +45,7 @@ dependencies: # A list of the chart requirements (optional)
     condition: minio.enabled
     alias: minio
   - name: Trino
-    version: "0.1.0"
+    version: "0.2.0"
     repository: "https://data354.github.io/Helmschart354/Trino"
     alias: trino
     condition: trino.enabled
