@@ -1,13 +1,48 @@
-# Helm-charts-codes
+# CHANGE LOG
 
-## INSTALLATION
+## RELEASE-1.0.0 (28-02-2023)
+
+###     COMPONENTS
+    - postgresql (no replication) release 0.2.0
+    - Minio release 5.0.1
+    - Apache airflow release 1.7.0
+    - Trino release 0.2.0
+
+
+### INSTALLATION
+
 
 helm repo add datastack https://data354.github.io/Helmschart354/datastack/
 
 
-helm install $release_name datastack/modernstack --set pg.enabled=true,minio.enabled=true,airflow.enabled=false,trino.enabled=false --debug
+helm install $release_name datastack/modernstack --set pg.enabled=true,minio.enabled=true,airflow.enabled=true,trino.enabled=true --debug
 
-## DESCRIPTION
+helm get values $release_name -o yaml > values.yaml
+
+you can modify all values that you want and upgrade your release
+
+helm upgrade --install $release -f values.yaml --debug
+
+
+
+### BUGS
+
+yes with Trino
+
+
+
+
+
+
+---------------------------------
+
+
+
+
+
+
+
+# DESCRIPTION
 
 This git repo contains all the files for creating a helm chart to facilitate the deployment of the next stack on k8s:
 
