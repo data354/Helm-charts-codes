@@ -25,7 +25,7 @@ appVersion: "1.16.0"
 
 dependencies: # A list of the chart requirements (optional)
   - name: Postgres354
-    version: "0.2.0"
+    version: "0.3.0"
     repository: "https://data354.github.io/Helmschart354/postgreschart/"
     alias: pg
 
