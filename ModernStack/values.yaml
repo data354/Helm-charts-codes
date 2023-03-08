@@ -1633,19 +1633,19 @@ minio:
   ## List of buckets to be created after minio install
   ##
   buckets:
-    #   # Name of the bucket
-    # - name: bucket1
-    #   # Policy to be set on the
-    #   # bucket [none|download|upload|public]
-    #   policy: none
-    #   # Purge if bucket exists already
-    #   purge: false
-    #   # set versioning for
-    #   # bucket [true|false]
-    #   versioning: false
-    #   # set objectlocking for
-    #   # bucket [true|false] NOTE: versioning is enabled by default if you use locking
-    #   objectlocking: false
+      # Name of the bucket
+    - name: spark-logs
+      # Policy to be set on the
+      # bucket [none|download|upload|public]
+      policy: none
+      # Purge if bucket exists already
+      purge: false
+      # set versioning for
+      # bucket [true|false]
+      versioning: false
+      # set objectlocking for
+      # bucket [true|false] NOTE: versioning is enabled by default if you use locking
+      objectlocking: false
     # - name: bucket2
     #   policy: none
     #   purge: false
