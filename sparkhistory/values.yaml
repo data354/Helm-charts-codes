@@ -1,0 +1,52 @@
+# Default values for spark-hs
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: team354/spark
+  tag: 14.0.0
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+#  - name: my-secret
+
+serviceAccount:
+  create: false
+  name: ''
+
+# S3 path to read logs from
+# S3logPath: my-company-s3-bucket/spark-hs
+S3:
+  logEndpoint:  '' #'http://{{ .Release.Name}}-minio:9000'
+  logPath: ''    #'s3a://spark-logs/EventLogs/'
+  accessKey: ''
+  secretKey: ''
+
+
+service:
+  externalPort: 80
+  internalPort: 18080
+  type: ClusterIP
+  nodePort: 30010
+
+resources: {}
+# resources:
+#   limits:
+#     cpu: 500m
+#     memory: 1024Mi
+
+#   requests:
+#     cpu: 250m
+#     memory: 512Mi
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+  # host: 'mycompany.com'
+  # path: '/'
+autoscaling:
+  enabled: false

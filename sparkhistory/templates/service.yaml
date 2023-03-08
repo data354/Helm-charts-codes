@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sparkhistory.fullname" . }}
+  labels:
+    {{- include "sparkhistory.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.externalPort }}
+      targetPort: {{ .Values.service.internalPort }}
+      protocol: TCP
+      name: http
+  {{- if eq .Values.service.type "NodePort"}}
+      nodePort: {{.Values.service.nodePort}}
+  {{- end}}
+  selector:
+    {{- include "sparkhistory.selectorLabels" . | nindent 4 }}

@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "sparkHistory.name" -}}
+{{- define "sparkhistory.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "sparkHistory.fullname" -}}
+{{- define "sparkhistory.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "sparkHistory.chart" -}}
+{{- define "sparkhistory.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "sparkHistory.labels" -}}
-helm.sh/chart: {{ include "sparkHistory.chart" . }}
-{{ include "sparkHistory.selectorLabels" . }}
+{{- define "sparkhistory.labels" -}}
+helm.sh/chart: {{ include "sparkhistory.chart" . }}
+{{ include "sparkhistory.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "sparkHistory.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sparkHistory.name" . }}
+{{- define "sparkhistory.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "sparkhistory.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "sparkHistory.serviceAccountName" -}}
+{{- define "sparkhistory.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "sparkHistory.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "sparkhistory.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

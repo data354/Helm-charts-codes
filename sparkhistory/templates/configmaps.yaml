@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "sparkhistory.fullname" . }}-spark-hs-config
+data:
+  spark-defaults.conf: |-
+    spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem
+    spark.hadoop.fs.s3a.endpoint={{ .Values.S3.logEndpoint}}                
+    spark.hadoop.fs.s3a.access.key={{ .Values.S3.accessKey}}  
+    spark.hadoop.fs.s3a.secret.key={{ .Values.S3.secretKey}} 
+    spark.hadoop.fs.s3a.aws.credentials.provider=org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider
+    spark.history.fs.eventLog.rolling.maxFilesToRetain=5

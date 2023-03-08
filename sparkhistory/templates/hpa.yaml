@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "sparkHistory.fullname" . }}
+  name: {{ include "sparkhistory.fullname" . }}
   labels:
-    {{- include "sparkHistory.labels" . | nindent 4 }}
+    {{- include "sparkhistory.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "sparkHistory.fullname" . }}
+    name: {{ include "sparkhistory.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
