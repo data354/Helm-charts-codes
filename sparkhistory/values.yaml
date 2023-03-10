@@ -21,8 +21,8 @@ serviceAccount:
 S3:
   logEndpoint: http://test-minio:9000 #'http://{{ .Release.Name}}-minio:9000'
   logPath: s3a://spark-logs/EventLogs/    #'s3a://spark-logs/EventLogs/'
-  accessKey: afgx4DIvZwrVInYi
-  secretKey: bgGt1U5nwdShGHApEflWkFwbtwPwuBdd
+  accessKey: 
+  secretKey: 
 
 
 service:

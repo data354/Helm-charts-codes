@@ -298,7 +298,7 @@ airflow:
   git:
     connexionType: http
     login: yasmine-datalab
-    password: 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
+    password: 
 
   data:
     brokerUrl: null
