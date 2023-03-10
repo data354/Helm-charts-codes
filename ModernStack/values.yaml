@@ -272,18 +272,19 @@ airflow:
       env: []
   dags:
     gitSync:
+      enabled: true
       branch: master
       containerName: git-sync
       depth: 1
-      enabled: true
       env: []
       extraVolumeMounts: []
       maxFailures: 0
-      repo: ssh://git@github.com/data354/Data-stack.git
+      repo: https://github.com/data354/Data-stack.git
       resources: {}
       rev: HEAD
       securityContext: {}
-      sshKeySecret: airflow-git-secret
+      sshKeySecret: 
+      credentialsSecret: airflow-git-secret
       subPath: airflow/dags
       uid: 65533
       wait: 60
@@ -294,6 +295,11 @@ airflow:
       size: 5Gi
       storageClassName: null
       subPath: null
+  git:
+    connexionType: http
+    login: yasmine-datalab
+    password: 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
+
   data:
     brokerUrl: null
     brokerUrlSecretName: null
