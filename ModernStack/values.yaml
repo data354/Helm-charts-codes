@@ -83,17 +83,16 @@ affinity: {}
 
 fluentbit:
   fluentdHost: fluentd.default
-  fluentdPort: 24224 
+  fluentdPort: 24224
 
 # airflow gitSync Cred
 gitSync:
-  username: ""  
+  username: ""
   password: ""
 
 # values for airflow
 airflow:
   # all values about airflow
- 
   enabled: true
   # Licensed to the Apache Software Foundation (ASF) under one
   # or more contributor license agreements.  See the NOTICE file
@@ -157,7 +156,7 @@ airflow:
   # Images
   images:
     airflow:
-      repository: team354/airflow-with-root 
+      repository: team354/airflow-with-root
       tag: 2.6.1
       # Specifying digest takes precedence over tag.
       digest: ~
@@ -646,7 +645,7 @@ airflow:
     kerberosSidecar:
       # Enable kerberos sidecar
       enabled: false
-      resources: 
+      resources:
         limits:
          cpu: 100m
          memory: 128Mi
@@ -654,7 +653,7 @@ airflow:
          cpu: 100m
          memory: 128Mi
 
-    resources: 
+    resources:
       limits:
        cpu: "1"
        memory: "4Gi"
@@ -734,7 +733,7 @@ airflow:
       args: ["bash", "/clean-logs"]
       # Number of days to retain logs
       retentionDays: 15
-      resources: 
+      resources:
         limits:
          cpu: 100m
          memory: 128Mi
@@ -2158,10 +2157,7 @@ airflow:
       # If using a custom storageClass, pass name here
       storageClassName:
       ## the name of an existing PVC to use
-      existingClaim:
-  
-
-    
+      existingClaim: 
 
 # values for postgresql
 pg:
@@ -2249,9 +2245,9 @@ pg:
     digest: ""
     pullPolicy: IfNotPresent
     pullSecrets: []
-    registry: harbor-registry.ocitnetad.ci
-    repository: motower/postgresql
-    tag: latest
+    registry: docker.io
+    repository: bitnami/postgres-exporter
+    tag: 0.11.1-debian-11-r69
   kubeVersion: ""
   ldap:
     basedn: ""
@@ -2664,8 +2660,8 @@ pgadmin:
   extraVolumes: []
   image:
     pullPolicy: IfNotPresent
-    registry: harbor-registry.ocitnetad.ci
-    repository: motower/pgadmin4
+    registry: docker.io
+    repository: dpage/pgadmin4
     tag: latest
   ingress:
     annotations: {}
@@ -2757,6 +2753,9 @@ minio:
   additionalAnnotations: {}
   additionalLabels: {}
   affinity: {}
+  defaultBucket:
+    enabled: true
+    name: "spark-logs"
   bucketRoot: ""
   buckets: []
   certsPath: /etc/minio/certs/
@@ -2862,7 +2861,7 @@ minio:
   mcImage:
     pullPolicy: IfNotPresent
     repository: quay.io/minio/mc
-    tag: RELEASE.2023-06-28T21-54-17Z
+    tag: RELEASE.2023-11-15T22-45-58Z
   metrics:
     serviceMonitor:
       additionalLabels: {}
@@ -2899,7 +2898,7 @@ minio:
     annotations: {}
     enabled: true
     existingClaim: ""
-    size: 500Gi
+    size: 5Gi
     storageClass: ""
     subPath: ""
     volumeName: ""
@@ -2925,7 +2924,7 @@ minio:
   replicas: 3
   resources:
     requests:
-      memory: 1Gi
+      memory: 500Mi
   rootPassword: ""
   rootUser: ""
   runtimeClassName: ""
@@ -3284,7 +3283,7 @@ sparkhs:
 
   image:
     repository: team354/spark
-    tag: 14.0.0
+    tag: 15.0.0
     pullPolicy: IfNotPresent
 
   imagePullSecrets: []
@@ -3297,16 +3296,16 @@ sparkhs:
   # S3 path to read logs from
   # S3logPath: my-company-s3-bucket/spark-hs
   S3:
-    logEndpoint:  '' #'http://{{ .Release.Name}}-minio:9000'
-    logPath: ''    #'s3a://spark-logs/EventLogs/'
-    accessKey: ''
-    secretKey: ''
+    logEndpoint:  'http://{{ .Release.Name}}-minio:9000'
+    logPath: 's3a://spark-logs/EventLogs/'
+    accessKey: 'admin'
+    secretKey: 'adminpassword'
 
 
   service:
     externalPort: 80
     internalPort: 18080
-    type: ClusterIP
+    type: NodePort
     nodePort: 30010
 
   resources: {}

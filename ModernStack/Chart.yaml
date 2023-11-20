@@ -46,7 +46,7 @@ dependencies: # A list of the chart requirements (optional)
     # import-values: # (optional)
     #   - ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items.
   - name: minio
-    version: "5.0.1"
+    version: "5.0.14"
     repository: "https://charts.min.io/"
     condition: minio.enabled
     alias: minio
