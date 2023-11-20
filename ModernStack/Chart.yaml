@@ -24,14 +24,20 @@ version: 1.0.0
 appVersion: "1.16.0"
 
 dependencies: # A list of the chart requirements (optional)
-  - name: Postgres354
-    version: "0.2.0"
-    repository: "https://data354.github.io/Helmschart354/postgreschart/"
+  - name: postgresql
+    version: "12.10.0"
+    repository: "https://charts.bitnami.com/bitnami"
     condition: pg.enabled
     alias: pg
+  
+  - name: pgadmin4
+    version: "1.17.1"
+    repository: "https://helm.runix.net"
+    alias: pgadmin
+    condition: pg.enabled,pgadmin.enabled
 
   - name: airflow
-    version: "1.7.0"
+    version: "1.9.0"
     repository: "https://airflow.apache.org"
     condition: airflow.enabled
     # import-values: # (optional)
@@ -50,6 +56,12 @@ dependencies: # A list of the chart requirements (optional)
     repository: "https://data354.github.io/Helmschart354/Trino"
     alias: trino
     condition: trino.enabled
+  
+  - name: sparkhistory
+    version: "0.1.0"
+    repository: "https://data354.github.io/Helmschart354/sparkhistoryserver"
+    alias: sparkhs
+    condition: sparkhs.enabled
     # import-values: # (optional)
     #   - ImportValues holds the mapping of source values to parent key to be imported. Each item can be a string or pair of child/parent sublist items.
 maintainers: # (optional)

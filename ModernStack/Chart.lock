@@ -1,15 +1,21 @@
 dependencies:
-- name: Postgres354
-  repository: https://data354.github.io/Helmschart354/postgreschart/
-  version: 0.2.0
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.10.0
+- name: pgadmin4
+  repository: https://helm.runix.net
+  version: 1.17.1
 - name: airflow
   repository: https://airflow.apache.org
-  version: 1.7.0
+  version: 1.9.0
 - name: minio
   repository: https://charts.min.io/
   version: 5.0.1
 - name: Trino
   repository: https://data354.github.io/Helmschart354/Trino
   version: 0.2.0
-digest: sha256:a237c83ebe8f151e334c8b0c3bd04b37517bc338e90556201384db47d8643dc0
-generated: "2023-03-06T08:26:27.765420434Z"
+- name: sparkhistory
+  repository: https://data354.github.io/Helmschart354/sparkhistoryserver
+  version: 0.1.0
+digest: sha256:99f4968ea134ee7024d6ad7828dfcd2c3033f8235e478b1cd02580783146fe68
+generated: "2023-11-20T15:37:05.660524053Z"
