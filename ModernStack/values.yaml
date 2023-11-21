@@ -3282,8 +3282,8 @@ sparkhs:
   replicaCount: 1
 
   image:
-    repository: team354/spark
-    tag: 15.0.0
+    repository: bitnami/spark
+    tag: 3.2.0
     pullPolicy: IfNotPresent
 
   imagePullSecrets: []
