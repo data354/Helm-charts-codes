@@ -1993,6 +1993,7 @@ airflow:
     elasticsearch:
       json_format: 'True'
       log_id_template: "{dag_id}_{task_id}_{execution_date}_{try_number}"
+      write_stdout: "True"  #write logs sortie standard
     elasticsearch_configs:
       max_retries: 3
       timeout: 30
