@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Release.Name}}-hive-initschema
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-failed, hook-succeeded,before-hook-creation
 spec:
   template:
     spec:

@@ -24,6 +24,23 @@ entries:
   Trino:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-11-21T13:54:56.124450327Z"
+    dependencies:
+    - alias: Hive
+      name: HiveMetastore
+      repository: https://data354.github.io/Helmschart354/HiveMetastore
+      tags:
+      - hiveConnector
+      version: 0.3.1
+    description: A Helm chart for Kubernetes
+    digest: 524981890bdc17e1748f7a66010c918dae485644ab4232f1a2049c501d9aae25
+    name: Trino
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/Trino-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-02-17T15:25:59.993703286Z"
     dependencies:
     - alias: Hive
@@ -57,6 +74,217 @@ entries:
     - https://data354.github.io/Helmschart354/datastack/charts/Trino-0.1.0.tgz
     version: 0.1.0
   airflow:
+  - annotations:
+      artifacthub.io/changes: |
+        - description: Add support for ``hostAliases`` for Airflow webserver and scheduler
+          kind: added
+          links:
+          - name: '#30051'
+            url: https://github.com/apache/airflow/pull/30051
+        - description: Add support for annotations on StatsD Deployment and cleanup CronJob
+          kind: added
+          links:
+          - name: '#30126'
+            url: https://github.com/apache/airflow/pull/30126
+        - description: Add support for annotations in logs PVC
+          kind: added
+          links:
+          - name: '#29270'
+            url: https://github.com/apache/airflow/pull/29270
+        - description: Add support for annotations in extra ConfigMap and Secrets
+          kind: added
+          links:
+          - name: '#30303'
+            url: https://github.com/apache/airflow/pull/30303
+        - description: Add support for pod annotations to PgBouncer
+          kind: added
+          links:
+          - name: '#30168'
+            url: https://github.com/apache/airflow/pull/30168
+        - description: Add support for ``ttlSecondsAfterFinished`` on ``migrateDatabaseJob``
+            and ``createUserJob``
+          kind: added
+          links:
+          - name: '#29314'
+            url: https://github.com/apache/airflow/pull/29314
+        - description: Add support for using SHA digest of Docker images
+          kind: added
+          links:
+          - name: '#30214'
+            url: https://github.com/apache/airflow/pull/30214
+        - description: Template extra volumes in Helm Chart
+          kind: changed
+          links:
+          - name: '#29357'
+            url: https://github.com/apache/airflow/pull/29357
+        - description: Make Liveness/Readiness Probe timeouts configurable for PgBouncer Exporter
+          kind: changed
+          links:
+          - name: '#29752'
+            url: https://github.com/apache/airflow/pull/29752
+        - description: Enable individual trigger logging
+          kind: changed
+          links:
+          - name: '#29482'
+            url: https://github.com/apache/airflow/pull/29482
+        - description: Add ``config.kubernetes_executor`` to values
+          kind: fixed
+          links:
+          - name: '#29818'
+            url: https://github.com/apache/airflow/pull/29818
+        - description: Block extra properties in image config
+          kind: fixed
+          links:
+          - name: '#30217'
+            url: https://github.com/apache/airflow/pull/30217
+        - description: Remove replicas if KEDA is enabled
+          kind: fixed
+          links:
+          - name: '#29838'
+            url: https://github.com/apache/airflow/pull/29838
+        - description: Mount ``kerberos.keytab`` to worker when enabled
+          kind: fixed
+          links:
+          - name: '#29526'
+            url: https://github.com/apache/airflow/pull/29526
+        - description: Fix adding annotations for dag persistence PVC
+          kind: fixed
+          links:
+          - name: '#29622'
+            url: https://github.com/apache/airflow/pull/29622
+        - description: Fix ``bitnami/postgresql`` default username and password
+          kind: fixed
+          links:
+          - name: '#29478'
+            url: https://github.com/apache/airflow/pull/29478
+        - description: Add global volumes in pod template file
+          kind: fixed
+          links:
+          - name: '#29295'
+            url: https://github.com/apache/airflow/pull/29295
+        - description: Add log groomer sidecar to triggerer service
+          kind: fixed
+          links:
+          - name: '#29392'
+            url: https://github.com/apache/airflow/pull/29392
+        - description: Helm deployment fails when ``postgresql.nameOverride`` is used
+          kind: fixed
+          links:
+          - name: '#29214'
+            url: https://github.com/apache/airflow/pull/29214
+        - description: 'Docs: Add gitSync optional env description'
+          kind: changed
+          links:
+          - name: '#29378'
+            url: https://github.com/apache/airflow/pull/29378
+        - description: 'Docs: Add webserver NodePort example'
+          kind: changed
+          links:
+          - name: '#29460'
+            url: https://github.com/apache/airflow/pull/29460
+        - description: 'Docs: Include Rancher in Helm chart install instructions'
+          kind: changed
+          links:
+          - name: '#28416'
+            url: https://github.com/apache/airflow/pull/28416
+        - description: 'Docs: Change RSA SSH host key to reflect update from Github'
+          kind: changed
+          links:
+          - name: '#30286'
+            url: https://github.com/apache/airflow/pull/30286
+        - description: 'Misc: Update Airflow version to 2.5.3'
+          kind: changed
+          links:
+          - name: '#30411'
+            url: https://github.com/apache/airflow/pull/30411
+        - description: 'Misc: Switch to newer versions of PgBouncer and PgBouncer Exporter
+            in chart'
+          kind: changed
+          links:
+          - name: '#29919'
+            url: https://github.com/apache/airflow/pull/29919
+        - description: 'Misc: Reformat chart templates'
+          kind: changed
+          links:
+          - name: '#29917'
+            url: https://github.com/apache/airflow/pull/29917
+        - description: 'Misc: Reformat chart templates part 2'
+          kind: changed
+          links:
+          - name: '#29941'
+            url: https://github.com/apache/airflow/pull/29941
+        - description: 'Misc: Reformat chart templates part 3'
+          kind: changed
+          links:
+          - name: '#30312'
+            url: https://github.com/apache/airflow/pull/30312
+        - description: 'Misc: Replace deprecated k8s registry references'
+          kind: changed
+          links:
+          - name: '#29938'
+            url: https://github.com/apache/airflow/pull/29938
+        - description: 'Misc: Fix ``airflow_dags_mount`` formatting'
+          kind: changed
+          links:
+          - name: '#29296'
+            url: https://github.com/apache/airflow/pull/29296
+        - description: 'Misc: Fix ``webserver.service.ports`` formatting'
+          kind: changed
+          links:
+          - name: '#29297'
+            url: https://github.com/apache/airflow/pull/29297
+      artifacthub.io/links: |
+        - name: Documentation
+          url: https://airflow.apache.org/docs/helm-chart/1.8.0/
+      artifacthub.io/screenshots: |
+        - title: DAGs View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/dags.png
+        - title: Datasets View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/datasets.png
+        - title: Grid View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/grid.png
+        - title: Graph View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/graph.png
+        - title: Calendar View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/calendar.png
+        - title: Variable View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/variable_hidden.png
+        - title: Gantt Chart
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/gantt.png
+        - title: Task Duration
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/duration.png
+        - title: Code View
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/code.png
+        - title: Task Instance Context Menu
+          url: https://airflow.apache.org/docs/apache-airflow/2.5.3/_images/context.png
+    apiVersion: v2
+    appVersion: 2.5.3
+    created: "2023-11-21T13:54:56.137034337Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.9
+    description: The official Helm chart to deploy Apache Airflow, a platform to programmatically
+      author, schedule, and monitor workflows
+    digest: 750ff03fa93049bb049c1dd91722530ba39c8e2af951883bf3fb8b2630fd0684
+    home: https://airflow.apache.org/
+    icon: https://airflow.apache.org/images/airflow_dark_bg.png
+    keywords:
+    - apache
+    - airflow
+    - workflow
+    - scheduler
+    maintainers:
+    - email: dev@airflow.apache.org
+      name: Apache Airflow PMC
+    name: airflow
+    sources:
+    - https://github.com/apache/airflow
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/airflow-1.9.0.tgz
+    version: 1.9.0
   - annotations:
       artifacthub.io/changes: |
         - description: Make cleanup job history configurable
@@ -297,6 +525,28 @@ entries:
     version: 1.7.0
   minio:
   - apiVersion: v1
+    appVersion: RELEASE.2023-09-30T07-02-29Z
+    created: "2023-11-21T13:54:56.138143068Z"
+    description: Multi-Cloud Object Storage
+    digest: 6c3656924fbad2cb17f810cd78f352f9b60626aaec64b837c96829095b215ad3
+    home: https://min.io
+    icon: https://min.io/resources/img/logo/MINIO_wordmark.png
+    keywords:
+    - minio
+    - storage
+    - object-storage
+    - s3
+    - cluster
+    maintainers:
+    - email: dev@minio.io
+      name: MinIO, Inc
+    name: minio
+    sources:
+    - https://github.com/minio/minio
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/minio-5.0.14.tgz
+    version: 5.0.14
+  - apiVersion: v1
     appVersion: RELEASE.2022-11-11T03-44-20Z
     created: "2023-02-17T15:26:00.005935721Z"
     description: Multi-Cloud Object Storage
@@ -319,6 +569,49 @@ entries:
     - https://data354.github.io/Helmschart354/datastack/charts/minio-5.0.1.tgz
     version: 5.0.1
   modernstack:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-11-21T13:54:56.118398101Z"
+    dependencies:
+    - alias: pg
+      condition: pg.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.10.0
+    - alias: pgadmin
+      condition: pg.enabled,pgadmin.enabled
+      name: pgadmin4
+      repository: https://helm.runix.net
+      version: 1.17.1
+    - condition: airflow.enabled
+      name: airflow
+      repository: https://airflow.apache.org
+      version: 1.9.0
+    - alias: minio
+      condition: minio.enabled
+      name: minio
+      repository: https://charts.min.io/
+      version: 5.0.14
+    - alias: trino
+      condition: trino.enabled
+      name: Trino
+      repository: https://data354.github.io/Helmschart354/Trino
+      version: 0.2.1
+    - alias: sparkhs
+      condition: sparkhs.enabled
+      name: sparkhistory
+      repository: https://data354.github.io/Helmschart354/sparkhistoryserver
+      version: 0.1.0
+    description: A Helm chart for Kubernetes
+    digest: 1e527aabadaacec677736e79da2076007653066a64ec4e0dbbd1bd4e5849ba06
+    maintainers:
+    - name: Data354
+      url: https://www.data354.com/
+    name: modernstack
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/modernstack-1.1.0.tgz
+    version: 1.1.0
   - apiVersion: v2
     appVersion: 1.16.0
     created: "2023-02-17T15:25:59.9912871Z"
@@ -387,4 +680,79 @@ entries:
     urls:
     - https://data354.github.io/Helmschart354/datastack/modernstack-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-17T15:25:59.962310051Z"
+  pgadmin4:
+  - apiVersion: v1
+    appVersion: "7.5"
+    created: "2023-11-21T13:54:56.138772614Z"
+    description: pgAdmin4 is a web based administration tool for PostgreSQL database
+    digest: 9d0182aff13eb035654ae2da588273048f3984f5adb5c4c9220afde3e986c121
+    home: https://www.pgadmin.org/
+    icon: https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png
+    keywords:
+    - pgadmin
+    - postgres
+    - database
+    - sql
+    maintainers:
+    - email: rowanruseler@gmail.com
+      name: rowanruseler
+    name: pgadmin4
+    sources:
+    - https://github.com/rowanruseler/helm-charts
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/pgadmin4-1.17.1.tgz
+    version: 1.17.1
+  postgresql:
+  - annotations:
+      category: Database
+      images: |
+        - name: os-shell
+          image: docker.io/bitnami/os-shell:11-debian-11-r43
+        - name: postgres-exporter
+          image: docker.io/bitnami/postgres-exporter:0.13.2-debian-11-r25
+        - name: postgresql
+          image: docker.io/bitnami/postgresql:15.4.0-debian-11-r10
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 15.4.0
+    created: "2023-11-21T13:54:56.141714721Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: PostgreSQL (Postgres) is an open source object-relational database
+      known for reliability and data integrity. ACID-compliant, it supports foreign
+      keys, joins, views, triggers and stored procedures.
+    digest: 86d6fe8827dd215da135b0efc62bd00c2d4cc05f440ee4f68ee0c4b32ad54ebb
+    home: https://bitnami.com
+    icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - sql
+    - replication
+    - cluster
+    maintainers:
+    - name: VMware, Inc.
+      url: https://github.com/bitnami/charts
+    name: postgresql
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/postgresql-12.10.0.tgz
+    version: 12.10.0
+  sparkhistory:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-11-21T13:54:56.141957244Z"
+    description: A Helm chart for Kubernetes
+    digest: 117405cc8af503a6335348ba330d74f710467b7eec152915f023f59e0aa32cca
+    name: sparkhistory
+    type: application
+    urls:
+    - https://data354.github.io/Helmschart354/datastack/charts/sparkhistory-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-11-21T13:54:56.083748539Z"

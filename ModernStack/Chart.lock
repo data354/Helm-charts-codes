@@ -13,9 +13,9 @@ dependencies:
   version: 5.0.14
 - name: Trino
   repository: https://data354.github.io/Helmschart354/Trino
-  version: 0.2.0
+  version: 0.2.1
 - name: sparkhistory
   repository: https://data354.github.io/Helmschart354/sparkhistoryserver
   version: 0.1.0
-digest: sha256:4d4fce39df7e22e98987c5494414d2b4d43b6d023d292035df9b9e0b755a52f2
-generated: "2023-11-20T16:25:41.076844034Z"
+digest: sha256:ab23414842723a906b31e8f28d04e9f46d650b3aa755a90c338eded0b568bb65
+generated: "2023-11-21T13:52:01.672510255Z"
