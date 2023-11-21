@@ -2246,8 +2246,8 @@ pg:
     pullPolicy: IfNotPresent
     pullSecrets: []
     registry: docker.io
-    repository: bitnami/postgres-exporter
-    tag: 0.11.1-debian-11-r69
+    repository: bitnami/postgresql
+    tag: 16.1.0-debian-11-r9
   kubeVersion: ""
   ldap:
     basedn: ""
@@ -2281,9 +2281,9 @@ pg:
       digest: ""
       pullPolicy: IfNotPresent
       pullSecrets: []
-      registry: harbor-registry.ocitnetad.ci
-      repository: motower/postgres-exporter
-      tag: latest
+      registry: docker.io
+      repository: bitnami/postgresql
+      tag: 16.1.0-debian-11-r9
     livenessProbe:
       enabled: true
       failureThreshold: 6
