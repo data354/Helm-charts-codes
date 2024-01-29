@@ -37,7 +37,7 @@ dependencies: # A list of the chart requirements (optional)
     condition: pg.enabled,pgadmin.enabled
 
   - name: airflow
-    version: "1.9.0"
+    version: "1.11.0"
     repository: "https://airflow.apache.org"
     condition: airflow.enabled
     # import-values: # (optional)

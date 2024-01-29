@@ -82,14 +82,13 @@ tolerations: []
 affinity: {}
 
 fluentbit:
-  fluentdHost: fluentd.defaut
+  fluentdHost: fluentd.toffe
   fluentdPort: 24224
 
 # airflow gitSync Cred
 gitSync:
-  username: ""
-  password: ""    
-
+  username: ''
+  password: ''
 # values for airflow
 airflow:
   enabled: true
@@ -173,8 +172,8 @@ airflow:
   # Images
   images:
     airflow:
-      repository: team354/airflow-extend-spark
-      tag: 1.0.0
+      repository: europe-west4-docker.pkg.dev/aq54-project/aq54-project/airflow-plugins-dependencies #team354/airflow-extend-spark 
+      tag: 1.0.2 #1.0.0
       # Specifying digest takes precedence over tag.
       digest: ~
       pullPolicy: IfNotPresent
@@ -2461,15 +2460,15 @@ airflow:
       # git repo clone url
       # ssh example: git@github.com:apache/airflow.git
       # https example: https://github.com/apache/airflow.git
-      repo: https://github.com/apache/airflow.git
-      branch: v2-2-stable
+      repo: https://github.com/data354/aq54_airflow.git
+      branch: dev-toffe
       rev: HEAD
       depth: 1
       # the number of consecutive failures allowed before aborting
       maxFailures: 0
       # subpath within the repo where dags are located
       # should be "" if dags are at repo root
-      subPath: "tests/dags"
+      subPath: ""
       # if your repo needs a user name password
       # you can load them to a k8s secret like the one below
       #   ---
@@ -2482,7 +2481,7 @@ airflow:
       #     GIT_SYNC_PASSWORD: <base64_encoded_git_password>
       # and specify the name of the secret below
       #
-      # credentialsSecret: git-credentials
+      credentialsSecret: git-credentials
       #
       #
       # If you are using an ssh clone url, you can load
@@ -2534,13 +2533,13 @@ airflow:
       # - name: ""
       #   value: ""
 
-      resources: {}
-      #  limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      #  requests:
-      #   cpu: 100m
-      #   memory: 128Mi
+      resources: 
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
 
   logs:
     persistence:
@@ -2562,7 +2561,7 @@ pg:
    # Default values for postgresql
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates
-  enabled : false
+  enabled : true
   architecture: standalone
   audit:
     clientMinMessages: error
@@ -3146,7 +3145,7 @@ pgadmin:
 
 # values for minio
 minio:
-  enabled: false
+  enabled: true
     ## Provide a name in place of minio for `app:` labels
   additionalAnnotations: {}
   additionalLabels: {}
@@ -3694,7 +3693,7 @@ sparkhs:
   # S3 path to read logs from
   # S3logPath: my-company-s3-bucket/spark-hs
   S3:
-    logEndpoint:  'http://{{ .Release.Name}}-minio:9000'
+    logEndpoint:  'http://mystack-minio:9000'
     logPath: 's3a://spark-logs/EventLogs/'
     accessKey: 'admin'
     secretKey: 'adminpassword'
